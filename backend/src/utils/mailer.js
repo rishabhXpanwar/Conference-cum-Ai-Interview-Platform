@@ -24,19 +24,19 @@ import nodemailer from "nodemailer";
 //     }
 // });
 
-export const transporter = nodemailer.createTransport({
-  service: "gmail",
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // Render par true (port 465) ya false (port 587) try karo
-  auth: {
-    user: process.env.EMAIL,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false, // Ye line cloud servers par connection issues solve karti hai
-  },
-});
+// export const transporter = nodemailer.createTransport({
+//   service: "gmail",
+//   host: "smtp.gmail.com",
+//   port: 465,
+//   secure: true, // Render par true (port 465) ya false (port 587) try karo
+//   auth: {
+//     user: process.env.EMAIL,
+//     pass: process.env.EMAIL_PASS,
+//   },
+//   tls: {
+//     rejectUnauthorized: false, // Ye line cloud servers par connection issues solve karti hai
+//   },
+// });
 
 // import nodemailer from "nodemailer";
 
@@ -54,3 +54,13 @@ export const transporter = nodemailer.createTransport({
 // bina arrow function ke createtransport phle call ho jata hai
 //or dotenv se email credentials load nahi hote the isliye error aata tha
 // ab jab bhi transporter call karenge toh wo function execute hoga aur tabhi email credentials load honge
+
+export const transporter = nodemailer.createTransport({
+  host: "smtp-relay.brevo.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL,
+    pass: process.env.EMAIL_PASS,
+  },
+});
