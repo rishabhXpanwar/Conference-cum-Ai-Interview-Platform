@@ -16,7 +16,7 @@ import userRoutes from "./src/routes/users.routes.js";
 
 import meetingRoutes from "./src/routes/meeting.routes.js";
 import activityRoutes from "./src/routes/activity.routes.js";
-
+import { transporter } from "./src/utils/mailer.js";
 dotenv.config();
 
 const app = express();
@@ -49,6 +49,11 @@ const startServer = async () => {
   connectDB(MONGO_URI);
   server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
+
+    transporter.verify((err, success) => {
+      if (err) console.log("SMTP ERROR:", err);
+      else console.log("SMTP READY");
+    });
   });
 };
 
