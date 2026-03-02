@@ -1,6 +1,6 @@
 import { useContext , useState,  } from "react";
 
-import "../styles/Signup.css";
+import "../styles/Auth.css";
 import { useNavigate, Link } from "react-router-dom";
 
 import { signupUser } from "../api/auth";
@@ -57,59 +57,73 @@ export default function Signup() {
 
 
   return (
-    <div className="root">
-    <div className="auth-container">
+    <div className="auth-page">
+      <div className="auth-glow" />
+
       <div className="auth-card">
-        <h2>Create Account</h2>
-        {error && <p className="error-text">{error}</p>}
-        < form onSubmit={handleSubmit} >
+        <div className="auth-brand">
+          <span className="auth-brand-name">MeetPro</span>
+        </div>
 
+        <h2 className="auth-heading">Create account</h2>
+        <p className="auth-subtext">Join MeetPro and start collaborating</p>
 
-        <input 
-        type="text"
-        name="name"
-        placeholder="Full Name"
-        value={formData.name}
-        onChange={handleChange}
-        required
-        />
+        {error && <div className="auth-error">{error}</div>}
 
-        <input 
-        type="text"
-        name="username"
-        placeholder="username"
-        value={formData.username}
-        onChange={handleChange}
-        required
-        
-        />
-
-        <input 
-        type="email"
-        name="email"
-        placeholder="abc@example.com"
-        value={formData.email}
-        onChange={handleChange}
-        required
-        />
-
-        <input 
-        type="password"
-        name="password"
-        placeholder="Password"
-        value={formData.password}
-        onChange={handleChange}
-        required
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? "Creating Acount..." : "Signup"}
-        </button>
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div className="auth-input-wrap">
+            <input
+              className="auth-input"
+              type="text"
+              name="name"
+              placeholder="Full name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="auth-input-wrap">
+            <input
+              className="auth-input"
+              type="text"
+              name="username"
+              placeholder="Username"
+              value={formData.username}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="auth-input-wrap">
+            <input
+              className="auth-input"
+              type="email"
+              name="email"
+              placeholder="Email address"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="auth-input-wrap">
+            <input
+              className="auth-input"
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <button className="auth-btn" type="submit" disabled={loading}>
+            {loading ? "Creating account…" : "Create Account"}
+          </button>
         </form>
 
-        <p className="switch-text">
-          Already Have an Account <Link to="/login">Login </Link> </p>
+        <p className="auth-switch">
+          Already have an account? <Link to="/login">Sign in</Link>
+        </p>
       </div>
-    </div>
     </div>
   );
 }

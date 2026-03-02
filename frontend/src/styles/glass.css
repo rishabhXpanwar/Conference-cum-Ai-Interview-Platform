@@ -1,0 +1,215 @@
+/* ========================================
+   GLASSMORPHISM & DEPTH SYSTEM
+   ======================================== */
+
+/* ---- Glass Panel ---- */
+
+.glass-panel {
+  background: rgba(15, 20, 35, 0.75);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition:
+    border-color var(--duration-base) var(--ease-smooth),
+    transform var(--duration-base) var(--ease-smooth);
+}
+
+.glass-panel:hover {
+  border-color: var(--color-border-hover);
+}
+
+/* ---- Glass Panel Variants ---- */
+
+.glass-panel--subtle {
+  background: rgba(15, 20, 35, 0.60);
+}
+
+/* backdrop-filter reserved for major panels only */
+.glass-panel--strong {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(var(--blur-md));
+  -webkit-backdrop-filter: blur(var(--blur-md));
+  border-color: rgba(255, 255, 255, 0.10);
+}
+
+/* ---- Floating Card ---- */
+
+.floating-card {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  transition: transform var(--duration-base) var(--ease-smooth);
+}
+
+.floating-card:hover {
+  transform: translateY(-2px);
+}
+
+/* ---- Depth Layers ---- */
+
+.depth-layer {
+  position: relative;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.depth-layer--1 {
+  transform: translateZ(0);
+  z-index: 1;
+}
+
+.depth-layer--2 {
+  transform: translateZ(10px);
+  z-index: 2;
+}
+
+.depth-layer--3 {
+  transform: translateZ(20px);
+  z-index: 3;
+}
+
+/* ---- Ambient Glow (reusable) ---- */
+
+.ambient-glow {
+  position: relative;
+}
+
+.ambient-glow::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(79, 125, 249, 0.10),
+    rgba(124, 91, 245, 0.08),
+    transparent 60%
+  );
+  z-index: -1;
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-smooth);
+  pointer-events: none;
+}
+
+.ambient-glow:hover::after {
+  opacity: 1;
+}
+
+/* ========================================
+   BUTTON SYSTEM
+   ======================================== */
+
+/* ---- Primary Button ---- */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: #fff;
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-blue),
+    var(--color-accent-violet)
+  );
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--duration-fast) var(--ease-smooth),
+    opacity var(--duration-fast) var(--ease-smooth);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  opacity: 0.9;
+}
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ---- Glow Button ---- */
+
+.btn-glow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-accent-blue);
+  background: transparent;
+  border: 1px solid rgba(79, 125, 249, 0.30);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition:
+    color var(--duration-base) var(--ease-smooth),
+    border-color var(--duration-base) var(--ease-smooth),
+    background var(--duration-base) var(--ease-smooth);
+}
+
+.btn-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(79, 125, 249, 0.08),
+    rgba(124, 91, 245, 0.05)
+  );
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-smooth);
+}
+
+.btn-glow:hover {
+  border-color: rgba(79, 125, 249, 0.50);
+  background: rgba(79, 125, 249, 0.06);
+  color: #fff;
+}
+
+.btn-glow:hover::before {
+  opacity: 1;
+}
+
+.btn-glow:active {
+  transform: scale(0.98);
+}
+
+/* ---- Ghost / Secondary Button ---- */
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition:
+    color var(--duration-fast) var(--ease-smooth),
+    background var(--duration-fast) var(--ease-smooth),
+    border-color var(--duration-fast) var(--ease-smooth);
+}
+
+.btn-ghost:hover {
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--color-border-hover);
+}

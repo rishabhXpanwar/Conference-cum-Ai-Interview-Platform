@@ -1,6 +1,6 @@
 import { useContext , useState } from "react";
 import { useNavigate , Link } from "react-router-dom";
-import "../styles/Signup.css";
+import "../styles/Auth.css";
 
 import { loginWithPassword, sendLoginOtp , verifyLoginOtp } from "../api/auth";
 import { AuthContext } from "../context/AuthContext";
@@ -95,112 +95,122 @@ export default function Login() {
   }
 
   return (
+    <div className="auth-page">
+      <div className="auth-glow" />
 
-
-    <div className="auth-container">
       <div className="auth-card">
-        <h2>
-          Login
+        <div className="auth-brand">
+          <span className="auth-brand-name">MeetPro</span>
+        </div>
+
+        <h2 className="auth-heading">
+          {isotpmode ? "Sign in with OTP" : "Welcome back"}
         </h2>
-        {error && <p className="error-text">{error}</p>}
+        <p className="auth-subtext">
+          {isotpmode
+            ? "Enter your email to receive a one-time code"
+            : "Sign in to continue to MeetPro"}
+        </p>
 
-        {/* /* Login with Password Form *//* */}
+        {error && <div className="auth-error">{error}</div>}
+
+        {/* Password login */}
         {!isotpmode && (
-          <form onSubmit={handleloginwithPassword}>
-            <input
-              name="email"
-              type="email"
-              placeholder="abc@example.com"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              />
-
+          <form className="auth-form" onSubmit={handleloginwithPassword}>
+            <div className="auth-input-wrap">
               <input
-               type="password"
-               name="password"
-               placeholder="password"
-               value={formData.password}
-               onChange={handleChange}
-               required
-               />
-
-               {/* Action Links */}
-               <div className="auth-links">
-                <span className="forgot-link">
-                  Forgot Password ?🤦‍♂️ 
-                </span>
-                <span 
-                className="otp-link"
-                onClick={()=> setisotpmode(true)}
-                >
-                  Login With OTP👌
-                </span>
-               </div>
-              <button disabled={loading}>
-                {loading? "Logging in..." : "Login" }
-              </button>
+                className="auth-input"
+                name="email"
+                type="email"
+                placeholder="Email address"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="auth-input-wrap">
+              <input
+                className="auth-input"
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="auth-links-row">
+              <span className="auth-link">Forgot password?</span>
+              <span
+                className="auth-link auth-link--accent"
+                onClick={() => setisotpmode(true)}
+              >
+                Login with OTP
+              </span>
+            </div>
+            <button className="auth-btn" type="submit" disabled={loading}>
+              {loading ? "Signing in…" : "Sign In"}
+            </button>
           </form>
         )}
 
-        {/* login with otp */}
+        {/* OTP login */}
         {isotpmode && (
           <>
-          {!otpsent ? (
-            <>
-            <input 
-            name="email"
-            type="email"
-            placeholder="abc@example.com"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            />
-            <button onClick={handleSendOtp} disabled={loading}>
-              {loading? "Sending Otp..." : "Send OTP"}
-            </button>
-            <p
-              className="opt-link"
-              onClick={()=>{
-                setisotpmode(false);
-                setotpsent(false);
-              }}>
-                Back to Password Login😏
-              </p>
-
-            </>
-          ):(
-            <>
-            <form onSubmit={handleVerifyOtp}>
-              <input
-               type="otp"
-               name="otp"
-               placeholder="Enter OTP"
-               value={formData.otp}
-               onChange={handleChange}
-               required
-               />
-
-               <button disabled={loading}>
-                {loading ? "Verifiying..." : "Verify OTP"}
-               </button>
-
-
-            </form>
-            </>
-          )}
-
-
-
+            {!otpsent ? (
+              <div className="auth-form">
+                <div className="auth-input-wrap">
+                  <input
+                    className="auth-input"
+                    name="email"
+                    type="email"
+                    placeholder="Email address"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <button
+                  className="auth-btn"
+                  onClick={handleSendOtp}
+                  disabled={loading}
+                >
+                  {loading ? "Sending…" : "Send OTP"}
+                </button>
+                <span
+                  className="auth-back-link"
+                  onClick={() => { setisotpmode(false); setotpsent(false); }}
+                >
+                  ← Back to password login
+                </span>
+              </div>
+            ) : (
+              <form className="auth-form" onSubmit={handleVerifyOtp}>
+                <p className="auth-otp-hint">
+                  A code was sent to <strong>{formData.email}</strong>
+                </p>
+                <div className="auth-input-wrap">
+                  <input
+                    className="auth-input"
+                    type="text"
+                    name="otp"
+                    placeholder="Enter OTP"
+                    value={formData.otp}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <button className="auth-btn" type="submit" disabled={loading}>
+                  {loading ? "Verifying…" : "Verify OTP"}
+                </button>
+              </form>
+            )}
           </>
-
         )}
 
-        <p className="switch-text">
-          Don't Have an account <Link to="/signup">Signup </Link>
-
+        <p className="auth-switch">
+          Don’t have an account? <Link to="/signup">Sign up</Link>
         </p>
-
       </div>
     </div>
   );

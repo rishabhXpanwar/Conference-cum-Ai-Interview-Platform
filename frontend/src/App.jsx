@@ -7,10 +7,13 @@ import Dashboard from "./pages/Dashboard";
 import MeetingRoom from "./pages/MeetingRoom";
 import Activity from "./pages/Activity";
 import ProtectedRoute from "./components/protectedRoutes";
+import Background from "./components/Background";
 
 function App() {
   return (
-    
+    <div className="app-shell">
+      <Background />
+      <div className="app-content">
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
@@ -46,7 +49,8 @@ function App() {
           }
         />
       </Routes>
-    
+      </div>
+    </div>
   );
 }
 

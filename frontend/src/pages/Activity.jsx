@@ -1,7 +1,18 @@
 import { useEffect, useState } from "react"
+import { Link } from "react-router-dom";
 import API from "../api/axios";
 
-import "../styles/Dashboard.css";
+import "../styles/Activity.css";
+
+/* Display-only helper — does not touch business logic */
+function formatDuration(ms) {
+  const totalSec = Math.floor(ms / 1000);
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  if (m === 0) return `${s}s`;
+  if (s === 0) return `${m}m`;
+  return `${m}m ${s}s`;
+}
 
 
 export default function Activity() {
@@ -28,22 +39,58 @@ export default function Activity() {
 
 
   return (
-     <div className="dashboard-container">
-      <div className="activity-section">
-        <h3>Your Recent Meetings</h3>
+    <div className="act-page">
+      <div className="act-inner">
 
-        {activity.length === 0 ? (
-          <p>No meetings attended yet.</p>
-        ) : (
-          activity.slice(0, 5).map((item, index) => (
-            <div key={index} className="activity-card">
-              <p><b>Code:</b> {item.meetingCode}</p>
-              <p><b>Joined:</b> {new Date(item.joinedAt).toLocaleString()}</p>
-              <p><b>Duration:</b> {(item.duration / 1000).toFixed(0)} sec</p>
-            </div>
-          ))
+        {/* ---- Header ---- */}
+        <div className="act-header">
+          <h1 className="act-title">Activity</h1>
+          <p className="act-subtitle">Your last 5 meeting sessions</p>
+        </div>
+
+        {/* ---- Error ---- */}
+        {error && <div className="act-error">{error}</div>}
+
+        {/* ---- Empty state ---- */}
+        {activity.length === 0 && !error && (
+          <div className="act-empty">
+            <div className="act-empty-icon">📋</div>
+            <p className="act-empty-text">No meetings attended yet.</p>
+            <p className="act-empty-sub">Create or join a meeting to see your history here.</p>
+            <Link to="/dashboard" className="act-empty-cta">Go to Dashboard</Link>
+          </div>
         )}
+
+        {/* ---- Timeline ---- */}
+        {activity.length > 0 && (
+          <ol className="act-timeline">
+            {activity.slice(0, 5).map((item, index) => (
+              <li key={index} className="act-item">
+                <div className="act-item-dot" />
+                <div className="act-card">
+
+                  <div className="act-card-top">
+                    <span className="act-code-badge">
+                      {item.meetingCode}
+                    </span>
+                    <span className="act-duration">
+                      {formatDuration(item.duration)}
+                    </span>
+                  </div>
+
+                  <div className="act-card-bottom">
+                    <span className="act-date">
+                      {new Date(item.joinedAt).toLocaleString()}
+                    </span>
+                  </div>
+
+                </div>
+              </li>
+            ))}
+          </ol>
+        )}
+
       </div>
-      </div>
+    </div>
   );
 }

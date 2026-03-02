@@ -71,81 +71,116 @@ export default function Dashboard() {
 
 
   return (
-    <div className="dashboard-container">
-      <div className="dashboard-navbar">
-        <h2>MeetPro</h2>
-        <div className="nav-right">
-          <span > Welcome, {user?.name} </span>
-          <button onClick={()=> navigate("/activity")}>MY Activity</button>
-          <button onClick={logout}> Logout </button>
+    <div className="dash-page">
 
-        </div>
-
-      </div>
-
-      {error && <p className="error-text">{error}</p>}
-
-      {/* Main Section */}
-
-      <div className="dashboard-cards">
-        <div className="card">
-          <h3> Create new Meeting</h3>
-          <button onClick={handlecreateMeeting} disabled={loading}>
-            {loading ? "Creating...." : "Create Meeting"}
+      {/* ======================== NAVBAR ======================== */}
+      <nav className="dash-nav">
+        <span className="dash-nav-logo">MeetPro</span>
+        <div className="dash-nav-right">
+          <span className="dash-welcome-pill">
+            Welcome, <span>{user?.name}</span>
+          </span>
+          <button
+            className="dash-nav-btn dash-nav-btn--ghost"
+            onClick={() => navigate("/activity")}
+          >
+            My Activity
+          </button>
+          <button
+            className="dash-nav-btn dash-nav-btn--danger"
+            onClick={logout}
+          >
+            Logout
           </button>
         </div>
+      </nav>
 
+      {/* ======================== MAIN ======================== */}
+      <main className="dash-main">
 
-        <div className="card">
-          <h3>Join Meeting</h3>
-          <input 
-           type="text"
-           name="joincode"
-           placeholder="meeting Code"
-           value={joincode}
-           onChange={(e)=> setjoincode(e.target.value)}
-           />
-           <button onClick={handlejoinMeeting}>
-            Join Meeting
-           </button>
+        <div className="dash-section-header">
+          <h2 className="dash-greeting">Good to have you back.</h2>
+          <p className="dash-greeting-sub">Create or join a meeting to get started.</p>
         </div>
 
+        {error && <div className="dash-error">{error}</div>}
 
-        {showModal && (
-          <div className="modal-overlay">
-            <div className="modal-card">
-              <h3>Meeting Created</h3>
-              <p className="meeting-code">{meetingCode}</p>
-              <div className="modal-buttons">
-                <button onClick={handlecopy}>Copy</button>
-                <button onClick={handleshare}>Share </button>
-                </div>
+        <div className="dash-cards">
 
-                <button 
-                  className="join-btn"
-                  onClick={()=> navigate(`/meeting/${meetingCode}`)}>
-                    Join the Meeting
-                  </button>
-
-                  <p 
-                    className="close-text"
-                    onClick={()=> setshowModal(false)}
-                    >
-                      Close
-                    </p>
-
-              </div>
+          {/* Create Meeting */}
+          <div className="dash-card dash-card--create">
+            <div className="dash-card-icon dash-card-icon--blue">📹</div>
+            <h3 className="dash-card-title">New Meeting</h3>
+            <p className="dash-card-desc">
+              Start an instant room and invite participants with a code.
+            </p>
+            <button
+              className="dash-btn dash-btn--primary"
+              onClick={handlecreateMeeting}
+              disabled={loading}
+            >
+              {loading ? "Creating…" : "Create Meeting"}
+            </button>
           </div>
-        )}
 
+          {/* Join Meeting */}
+          <div className="dash-card dash-card--join">
+            <div className="dash-card-icon dash-card-icon--cyan">🔗</div>
+            <h3 className="dash-card-title">Join Meeting</h3>
+            <p className="dash-card-desc">
+              Paste a meeting code below and jump straight in.
+            </p>
+            <input
+              className="dash-input"
+              type="text"
+              name="joincode"
+              placeholder="Enter meeting code"
+              value={joincode}
+              onChange={(e) => setjoincode(e.target.value)}
+            />
+            <button
+              className="dash-btn dash-btn--join"
+              onClick={handlejoinMeeting}
+            >
+              Join Meeting
+            </button>
+          </div>
 
+        </div>
+      </main>
 
+      {/* ======================== MODAL ======================== */}
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-card">
+            <h3 className="modal-title">Meeting Created</h3>
+            <p className="modal-subtitle">Share the code with participants</p>
 
+            <div className="meeting-code-wrap">
+              <p className="meeting-code">{meetingCode}</p>
+            </div>
 
+            <div className="modal-buttons">
+              <button className="modal-btn" onClick={handlecopy}>Copy Code</button>
+              <button className="modal-btn" onClick={handleshare}>Share Link</button>
+            </div>
 
+            <button
+              className="join-btn"
+              onClick={() => navigate(`/meeting/${meetingCode}`)}
+            >
+              Join the Meeting
+            </button>
 
-
-      </div>
+            <span
+              className="close-text"
+              onClick={() => setshowModal(false)}
+            >
+              Dismiss
+            </span>
+          </div>
+        </div>
+      )}
 
     </div>
   )

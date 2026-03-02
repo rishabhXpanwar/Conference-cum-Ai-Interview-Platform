@@ -1,0 +1,114 @@
+/* ========================================
+   TRANSITION & ANIMATION SYSTEM
+   ======================================== */
+
+/* ---- Fade In ---- */
+
+.fade-in {
+  animation: fadeIn var(--duration-slow) var(--ease-smooth) both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ---- Fade In Up ---- */
+
+.fade-in-up {
+  animation: fadeInUp var(--duration-slow) var(--ease-smooth) both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- Fade In Down ---- */
+
+.fade-in-down {
+  animation: fadeInDown var(--duration-slow) var(--ease-smooth) both;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- Scale In ---- */
+
+.scale-in {
+  animation: scaleIn var(--duration-base) var(--ease-spring) both;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ---- Float: opt-in via hover only (no infinite loop) ---- */
+
+.float {
+  transition: transform var(--duration-slow) var(--ease-smooth);
+}
+
+.float:hover {
+  transform: translateY(-4px);
+}
+
+/* ---- Pulse Glow: static glow, no animation ---- */
+
+.pulse-glow {
+  box-shadow: 0 0 20px rgba(79, 125, 249, 0.12);
+}
+
+/* ---- Stagger Delay Utilities ---- */
+
+.delay-1 { animation-delay: 100ms; }
+.delay-2 { animation-delay: 200ms; }
+.delay-3 { animation-delay: 300ms; }
+.delay-4 { animation-delay: 400ms; }
+.delay-5 { animation-delay: 500ms; }
+
+/* ---- Smooth Transition Utilities ---- */
+
+/* Avoid transition-all: specify explicit properties instead */
+.transition-all {
+  transition:
+    transform var(--duration-base) var(--ease-smooth),
+    opacity var(--duration-base) var(--ease-smooth),
+    border-color var(--duration-base) var(--ease-smooth);
+}
+
+.transition-transform {
+  transition: transform var(--duration-base) var(--ease-smooth);
+}
+
+.transition-opacity {
+  transition: opacity var(--duration-base) var(--ease-smooth);
+}
+
+.transition-colors {
+  transition:
+    color var(--duration-fast) var(--ease-smooth),
+    background-color var(--duration-fast) var(--ease-smooth),
+    border-color var(--duration-fast) var(--ease-smooth);
+}
