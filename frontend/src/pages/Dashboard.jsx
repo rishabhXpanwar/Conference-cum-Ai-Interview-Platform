@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/axios";
 
-import "./Dashboard.css";
+import "../styles/Dashboard.css";
 
 
 
@@ -60,7 +60,7 @@ export default function Dashboard() {
   };
 
   const handleshare =() => {
-    const link = `${windows.location.origin}/meeting/${meetingCode}`;
+    const link = `${window.location.origin}/meeting/${meetingCode}`;
     navigator.clipboard.writeText(link);
     alert("Meeting Link copied");
   };

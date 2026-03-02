@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import API from "../api/axios";
 
-import "./Dashboard.css";
+import "../styles/Dashboard.css";
 
 
 export default function Activity() {

@@ -1,6 +1,6 @@
 import { useContext , useState,  } from "react";
 
-import "./Signup.css";
+import "../styles/Signup.css";
 import { useNavigate, Link } from "react-router-dom";
 
 import { signupUser } from "../api/auth";
