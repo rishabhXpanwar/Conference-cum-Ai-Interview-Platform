@@ -1,5 +1,5 @@
 import { useContext, useState } from "react"
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/axios";
 
@@ -12,6 +12,7 @@ import "../styles/Dashboard.css";
 export default function Dashboard() {
 
   const navigate = useNavigate();
+  const location = useLocation();
   const { user , logout } = useContext(AuthContext);
 
 
@@ -76,6 +77,23 @@ export default function Dashboard() {
       {/* ======================== NAVBAR ======================== */}
       <nav className="dash-nav">
         <span className="dash-nav-logo">MeetPro</span>
+
+        {/* ---- Mode Toggle ---- */}
+        <div className="dash-toggle-pill">
+          <span
+            className={`dash-toggle-option${location.pathname === "/dashboard" ? " dash-toggle-option--active" : ""}`}
+            onClick={() => navigate("/dashboard")}
+          >
+            Dashboard
+          </span>
+          <span
+            className={`dash-toggle-option${location.pathname === "/ai/dashboard" ? " dash-toggle-option--active" : ""}`}
+            onClick={() => navigate("/ai/dashboard")}
+          >
+            AI Dashboard
+          </span>
+        </div>
+
         <div className="dash-nav-right">
           <span className="dash-welcome-pill">
             Welcome, <span>{user?.name}</span>

@@ -47,6 +47,70 @@
   background-clip: text;
 }
 
+/* ---- Mode Toggle Pill ---- */
+
+.dash-toggle-pill {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  padding: 4px;
+  gap: 2px;
+  position: relative;
+}
+
+.dash-toggle-option {
+  position: relative;
+  padding: 6px 18px;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.42);
+  cursor: pointer;
+  user-select: none;
+  transition:
+    color 0.28s ease,
+    background 0.28s ease,
+    box-shadow 0.28s ease;
+  white-space: nowrap;
+  letter-spacing: 0.15px;
+}
+
+.dash-toggle-option:hover:not(.dash-toggle-option--active) {
+  color: rgba(255, 255, 255, 0.68);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.dash-toggle-option--active {
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.22) 0%, rgba(34, 211, 238, 0.18) 100%);
+  border: 1px solid rgba(20, 184, 166, 0.30);
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 600;
+  box-shadow:
+    0 2px 12px rgba(20, 184, 166, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Responsive — hide pill label on small screens, keep it compact */
+@media (max-width: 768px) {
+  .dash-toggle-option {
+    padding: 5px 12px;
+    font-size: 0.74rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dash-toggle-pill {
+    padding: 3px;
+  }
+
+  .dash-toggle-option {
+    padding: 4px 10px;
+    font-size: 0.70rem;
+  }
+}
+
 .dash-nav-right {
   display: flex;
   align-items: center;

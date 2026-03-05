@@ -1,0 +1,19 @@
+.ai-activity{
+padding:40px;
+}
+
+.ai-table{
+width:100%;
+border-collapse:collapse;
+}
+
+.ai-table th{
+background:#f4f4f4;
+padding:12px;
+text-align:left;
+}
+
+.ai-table td{
+padding:12px;
+border-top:1px solid #eee;
+}

@@ -217,10 +217,40 @@
 import { Server } from "socket.io";
 import meetingModel from "../models/meeting.model.js";
 import meetingAttendanceModel from "../models/meetingAttendance.model.js";
+import AIInterview from "../models/aiInterview.model.js";
+import Resume from "../models/resume.model.js";
+import {
+  generateInterviewQuestion,
+  generateInterviewScore,
+} from "../services/interviewService.js";
 
-let connections = {}; // meetingCode -> Set(socketIds)
-let messages = {}; // meetingCode -> chat messages
-let activeSession = {}; // socketId -> session info
+
+
+
+
+//parse Gemini response for score
+const parseScore = (text) => {
+  const tech = text.match(/TECHNICAL:\s*(\d+)/);
+  const comm = text.match(/COMMUNICATION:\s*(\d+)/);
+  const overall = text.match(/OVERALL:\s*(\d+)/);
+  const feedback = text.match(/FEEDBACK:\s*([\s\S]*)/);
+
+  return {
+    technical: tech ? Number(tech[1]) : 0,
+    communication: comm ? Number(comm[1]) : 0,
+    overall: overall ? Number(overall[1]) : 0,
+    feedback: feedback ? feedback[1].trim() : "",
+  };
+};
+
+
+
+
+
+
+/* =====================================================
+   SOCKET CONNECTION SETUP
+===================================================== */
 
 export const connectToSocket = (server) => {
   const io = new Server(server, {
@@ -230,8 +260,19 @@ export const connectToSocket = (server) => {
     },
   });
 
-  io.on("connection", (socket) => {
-    console.log("Client connected:", socket.id);
+  /* =====================================================
+     1️⃣ NORMAL MEETING NAMESPACE
+  ===================================================== */
+
+  const meetingNamespace = io.of("/meeting");
+  let connections = {}; // meetingCode -> Set(socketIds)
+  let messages = {}; // meetingCode -> chat messages
+  let activeSession = {}; // socketId -> session info
+
+  // io.on("connection", (socket) => {
+  //   console.log("Client connected:", socket.id);
+  meetingNamespace.on("connection", (socket) => {
+    console.log("Meeting user connected:", socket.id);
 
     /* =====================================================
        JOIN MEETING
@@ -308,7 +349,7 @@ export const connectToSocket = (server) => {
 
       messages[meetingCode].push(msgObj);
 
-      io.to(meetingCode).emit("chat-message", msgObj);
+      meetingNamespace.to(meetingCode).emit("chat-message", msgObj);
     });
 
     /* =====================================================
@@ -340,7 +381,7 @@ export const connectToSocket = (server) => {
 
       if (meeting.host.toString() !== session.userId) return;
 
-      const targetSocket = io.sockets.sockets.get(targetSocketId);
+      const targetSocket = meetingNamespace.sockets.get(targetSocketId);
 
       if (targetSocket) {
         targetSocket.emit("kicked");
@@ -353,11 +394,9 @@ export const connectToSocket = (server) => {
     ===================================================== */
 
     socket.on("offer", ({ to, offer }) => {
-
       const session = activeSession[socket.id];
 
-
-      io.to(to).emit("offer", {
+      meetingNamespace.to(to).emit("offer", {
         from: socket.id,
         offer,
         username: session?.username,
@@ -365,14 +404,14 @@ export const connectToSocket = (server) => {
     });
 
     socket.on("answer", ({ to, answer }) => {
-      io.to(to).emit("answer", {
+      meetingNamespace.to(to).emit("answer", {
         from: socket.id,
         answer,
       });
     });
 
     socket.on("ice-candidate", ({ to, candidate }) => {
-      io.to(to).emit("ice-candidate", {
+      meetingNamespace.to(to).emit("ice-candidate", {
         from: socket.id,
         candidate,
       });
@@ -414,4 +453,325 @@ export const connectToSocket = (server) => {
       console.log("Client disconnected:", socket.id);
     });
   });
+
+  /* =====================================================
+     2️⃣ AI INTERVIEW NAMESPACE
+  ===================================================== */
+
+  const aiNamespace = io.of("/ai");
+
+  let aiConnections = {};
+  let aiSessions = {};
+
+  aiNamespace.on("connection" , (socket) => {
+    console.log("AI Interview user connected:", socket.id);
+
+    /* =====================================================
+        JOIN AI INTERVIEW
+      ===================================================== */
+    socket.on("join-ai-room", async ({ aiCode, role, userId }) => {
+      const interview = await AIInterview.findOne({ aiCode });
+      if (!interview)
+        return socket.emit("ai-error", {
+          message: "Invalid AI Interview Code",
+        });
+
+      if (
+        role === "candidate" &&
+        interview.candidate &&
+        interview.candidate.toString() !== userId
+      ) {
+        return socket.emit("ai-error", { message: "Not your interview" });
+      }
+
+      /* ==========================================
+     LOCK CANDIDATE TO THIS INTERVIEW
+  ========================================== */
+
+      if (role === "candidate") {
+        // agar koi candidate assigned nahi hai
+        if (!interview.candidate) {
+          interview.candidate = userId;
+          await interview.save();
+        }
+
+        // agar candidate already assigned hai aur same user nahi hai
+        if (interview.candidate.toString() !== userId) {
+          return socket.emit("ai-error", {
+            message: "This interview is already assigned to another candidate",
+          });
+        }
+      }
+
+      if (!aiConnections[aiCode]) {
+        aiConnections[aiCode] = new Set();
+      }
+
+      aiConnections[aiCode].add(socket.id);
+
+      aiSessions[socket.id] = {
+        userId,
+        role,
+        aiCode,
+      };
+
+      //join the room
+      socket.join(aiCode);
+
+      //notify room
+
+      socket.to(aiCode).emit("ai-user-joined", {
+        socketId: socket.id,
+        role,
+      });
+
+      socket.emit("ai-joined", {
+        interviewId: interview._id,
+        role,
+        candidate: interview.candidate,
+      });
+    });
+
+    //---------------------------------------------------------------------------------------------------------------------
+    // AI WebRTC Signaling
+    // -------------------------------------------------------------------------------------------------
+
+    socket.on("ai-offer", ({ to, offer }) => {
+      aiNamespace.to(to).emit("ai-offer", {
+        from: socket.id,
+        offer,
+      });
+    });
+
+    socket.on("ai-answer", ({ to, answer }) => {
+      aiNamespace.to(to).emit("ai-answer", {
+        from: socket.id,
+        answer,
+      });
+    });
+
+    socket.on("ai-ice-candidate", ({ to, candidate }) => {
+      aiNamespace.to(to).emit("ai-ice-candidate", {
+        from: socket.id,
+        candidate,
+      });
+    });
+
+    /* =====================================================
+        Start AI Interview
+      ===================================================== */
+
+    socket.on("ai:start", async ({ interviewId }) => {
+      const session = aiSessions[socket.id];
+
+      if (!session || session.role !== "candidate")
+        return socket.emit("ai-error", {
+          message: "Unauthorized to start interview",
+        });
+
+      const interview = await AIInterview.findById(interviewId);
+      if (!interview)
+        return socket.emit("ai-error", { message: "Interview not found" });
+
+      const resume = await Resume.findOne({ user: interview.candidate });
+
+      if (!resume) {
+        return socket.emit("ai-error", {
+          message: "Please upload resume before starting interview",
+        });
+      }
+
+      const first = await generateInterviewQuestion({
+        summary: resume.summary,
+        phase: interview.phase,
+        history: [],
+        allowFollowUp: false,
+      });
+
+      interview.questions.push({
+        type: first.type,
+        question: first.question,
+      });
+
+      interview.mainQuestionCount = 1;
+      interview.status = "active";
+
+      await interview.save();
+
+      aiNamespace.to(session.aiCode).emit("ai-speaking", {
+        question: first.question,
+        type: first.type,
+      });
+    });
+
+    /* =====================================================
+   ANSWER
+===================================================== */
+
+    socket.on("ai:answer", async ({ interviewId, answer }) => {
+      try {
+        const session = aiSessions[socket.id];
+
+        // Only candidate allowed
+        if (!session || session.role !== "candidate") {
+          return socket.emit("ai-error", {
+            message: "Unauthorized to answer question",
+          });
+        }
+
+        const interview = await AIInterview.findById(interviewId);
+
+        if (!interview || interview.status === "completed") {
+          return socket.emit("ai-error", {
+            message: "Interview not found or already completed",
+          });
+        }
+
+        const resume = await Resume.findOne({ user: interview.candidate });
+
+        /* ==========================================
+       SAVE ANSWER
+    ========================================== */
+
+        const lastQuestion =
+          interview.questions[interview.questions.length - 1];
+
+        if (!lastQuestion) {
+          return socket.emit("ai-error", { message: "No question to answer" });
+        }
+
+        // prevent overwriting answer
+        if (lastQuestion.answer) {
+          return socket.emit("ai-error", {
+            message: "Question already answered",
+          });
+        }
+
+        lastQuestion.answer = answer;
+
+        await interview.save();
+
+        /* ==========================================
+       CHECK INTERVIEW COMPLETION
+    ========================================== */
+
+        if (interview.mainQuestionCount >= 10) {
+          const scoreText = await generateInterviewScore({
+            summary: resume.summary,
+            questions: interview.questions,
+          });
+
+          interview.score = parseScore(scoreText);
+          interview.status = "completed";
+
+          await interview.save();
+
+          aiNamespace.to(session.aiCode).emit("ai-completed", {
+            score: interview.score,
+            totalQuestions: interview.questions.length,
+          });
+
+          return;
+        }
+
+        /* ==========================================
+       PREPARE NEXT QUESTION
+    ========================================== */
+
+        const allowFollowUp = interview.followUpDepth < 2;
+        const history = interview.questions.slice(-3);
+
+        /* ==========================================
+       AI THINKING
+    ========================================== */
+
+        aiNamespace.to(session.aiCode).emit("ai:thinking");
+        await new Promise(resolve => setTimeout(resolve, 600));
+
+
+        const next = await generateInterviewQuestion({
+          summary: resume.summary,
+          phase: interview.phase,
+          history,
+          allowFollowUp,
+        });
+
+        /* ==========================================
+       AI TYPING
+    ========================================== */
+
+        aiNamespace.to(session.aiCode).emit("ai:typing");
+
+        /* ==========================================
+       SAVE QUESTION TO DB
+    ========================================== */
+
+        interview.questions.push({
+          type: next.type,
+          question: next.question,
+        });
+
+        if (next.type === "main") {
+          interview.mainQuestionCount += 1;
+          interview.followUpDepth = 0;
+
+          if (interview.mainQuestionCount <= 3) interview.phase = "resume";
+          else if (interview.mainQuestionCount <= 7)
+            interview.phase = "technical";
+          else interview.phase = "behavioral";
+        } else {
+          interview.followUpDepth += 1;
+        }
+
+        await interview.save();
+
+        /* ==========================================
+       AI SPEAKING
+    ========================================== */
+
+        setTimeout(() => {
+          aiNamespace.to(session.aiCode).emit("ai:speaking", {
+            question: next.question,
+            type: next.type,
+          });
+        }, 1200);
+      } catch (error) {
+        console.error("AI ANSWER ERROR:", error);
+
+        socket.emit("ai-error", {
+          message: "Failed to process answer",
+        });
+      }
+    });
+
+    /* =====================================================
+        End AI Interview
+      ===================================================== */
+    socket.on("disconnect", () => {
+      const session = aiSessions[socket.id];
+
+      if (!session) return;
+
+      const { aiCode } = session;
+
+      if (aiConnections[aiCode]) {
+        aiConnections[aiCode].delete(socket.id);
+
+        socket.to(aiCode).emit("ai-user-left", socket.id);
+
+        if (aiConnections[aiCode].size === 0) {
+          delete aiConnections[aiCode];
+        }
+      }
+
+      delete aiSessions[socket.id];
+
+      console.log("AI user disconnected:", socket.id);
+    });
+  });
+
+  
+
+
+
 };

@@ -1,0 +1,21 @@
+.ai-dashboard{
+padding:40px;
+text-align:center;
+}
+
+.ai-actions{
+margin-top:40px;
+display:flex;
+justify-content:center;
+gap:40px;
+}
+
+.ai-btn{
+padding:18px 40px;
+font-size:18px;
+background:#2563eb;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}

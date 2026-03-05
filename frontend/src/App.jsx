@@ -4,51 +4,79 @@ import Home from "./pages/Home";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import AIDashboard from "./pages/AIDashboard.jsx";
 import MeetingRoom from "./pages/MeetingRoom";
 import Activity from "./pages/Activity";
 import ProtectedRoute from "./components/protectedRoutes";
 import Background from "./components/Background";
+import Navbar from "./components/Navbar";
+import AIActivity from "./pages/AiActivity";
+import ResumeUpload from "./pages/ResumeUpload.jsx";
 
 function App() {
   return (
     <div className="app-shell">
       <Background />
       <div className="app-content">
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
 
-        {/* Protected Routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
+          {/* Protected Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
 
+          <Route
+            path="/activity"
+            element={
+              <ProtectedRoute>
+                <Activity />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/activity"
-          element={
-            <ProtectedRoute>
-              <Activity />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/ai/dashboard"
+            element={
+              <ProtectedRoute>
+                <AIDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ai/upload-resume/:aiCode"
+            element={
+              <ProtectedRoute>
+                <ResumeUpload />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ai/activity"
+            element={
+              <ProtectedRoute>
+                <AIActivity />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/meeting/:code"
-          element={
-            <ProtectedRoute>
-              <MeetingRoom />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+          <Route
+            path="/meeting/:code"
+            element={
+              <ProtectedRoute>
+                <MeetingRoom />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
       </div>
     </div>
   );

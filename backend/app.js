@@ -14,6 +14,9 @@ import router from "./src/routes/users.routes.js";
 
 import userRoutes from "./src/routes/users.routes.js";
 
+import resumeRoutes from "./src/routes/resume.routes.js";
+import aiInterviewRoutes from "./src/routes/aiInterview.routes.js";
+
 import meetingRoutes from "./src/routes/meeting.routes.js";
 import activityRoutes from "./src/routes/activity.routes.js";
 import { transporter } from "./src/utils/mailer.js";
@@ -42,6 +45,10 @@ const MONGO_URI = process.env.MONGO_URI;
 app.use("/api/auth", userRoutes);
 app.use("/api/meetings", meetingRoutes);
 app.use("/api/activity", activityRoutes);
+app.use("/api/resume", resumeRoutes);
+
+
+app.use("/api/ai", aiInterviewRoutes);
 
 //console.log("MONGO_URI:", MONGO_URI); // Debugging line to check if MONGO_URI is loaded
 
