@@ -10,8 +10,9 @@ import Activity from "./pages/Activity";
 import ProtectedRoute from "./components/protectedRoutes";
 import Background from "./components/Background";
 import Navbar from "./components/Navbar";
-import AIActivity from "./pages/AiActivity";
+import AIActivity from "./pages/AIActivity";
 import ResumeUpload from "./pages/ResumeUpload.jsx";
+import AiMeetingRoom from "./pages/AiMeetingRoom.jsx"
 
 function App() {
   return (
@@ -73,6 +74,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <MeetingRoom />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ai/room/:aicode"
+            element={
+              <ProtectedRoute>
+                <AiMeetingRoom />
               </ProtectedRoute>
             }
           />

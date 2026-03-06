@@ -1,7 +1,6 @@
 import multer from "multer";
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-const pdfParse = require("pdf-parse");
+
+import pdfParse from "pdf-parse/lib/pdf-parse.js";
 import Resume from "../models/resume.model.js";
 
 import { generateResumeSummary } from "../services/aiService.js";
@@ -101,9 +100,10 @@ export const uploadResume = [
     async (req , res) => {
 
         try {
-            // if(!req.file){
-            //     return res.status(400).json({ message : "No file uploaded" });
-            // }
+            
+            if(!req.file){
+                return res.status(400).json({ message : "No file uploaded" });
+            }
 
             //const filepath = req.file.path;
 
@@ -118,10 +118,14 @@ export const uploadResume = [
 
             const extractedText = pdfData.text;
 
-            // generate summary usi gemini 
-            const summary = await generateResumeSummary(extractedText);
-
-
+            // generate summary using gemini (fallback to null if AI is unavailable)
+            let summary = null;
+            try {
+                console.log("Resume parsing started");
+                summary = await generateResumeSummary(extractedText);
+            } catch (aiErr) {
+                console.warn("AI summary generation failed, saving resume without summary:", aiErr.message);
+            }
 
             // save or update resume in database
             let existingResume = await Resume.findOne({ user : req.user._id});
@@ -138,7 +142,8 @@ export const uploadResume = [
                     summary,
                 });
             }
-            
+            console.log("Resume parsing ended");
+            console.log(summary);
             // fs.unlinkSync(filepath); // delete the uploaded file after parsing
 
             res.status(200).json({ message : "Resume Uploaded and Parsed Successfully" });

@@ -12,10 +12,15 @@ export default function ResumeUpload() {
 
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [uploaded, setUploaded] = useState(false);
+
+  /* ==============================
+     Upload / Update Resume
+  ============================== */
 
   const handleUpload = async () => {
     if (!file) {
-      alert("Please upload resume");
+      alert("Please select a resume");
       return;
     }
 
@@ -24,7 +29,6 @@ export default function ResumeUpload() {
 
       const formData = new FormData();
       formData.append("resume", file);
-      formData.append("interviewId", interviewId);
 
       await API.post("/api/resume/upload", formData, {
         headers: {
@@ -32,9 +36,9 @@ export default function ResumeUpload() {
         },
       });
 
-      navigate(`/ai/interview/${aiCode}`, {
-        state: { interviewId },
-      });
+      alert("Resume uploaded successfully");
+
+      setUploaded(true);
     } catch (err) {
       alert(err.response?.data?.message || "Resume upload failed");
     } finally {
@@ -42,19 +46,58 @@ export default function ResumeUpload() {
     }
   };
 
+  /* ==============================
+     Start AI Interview
+  ============================== */
+
+  const startInterview = () => {
+    navigate(`/ai/room/${aiCode}`, {
+      state: { interviewId },
+    });
+  };
+
   return (
     <div className="resume-page">
       <div className="resume-box">
         <h2>Upload Resume</h2>
 
-        <input
-          type="file"
-          accept=".pdf"
-          onChange={(e) => setFile(e.target.files[0])}
-        />
+        <p>Your resume will be used to generate AI interview questions.</p>
+
+        <label className="file-input-label">
+          <input
+            type="file"
+            accept=".pdf"
+            onChange={(e) => setFile(e.target.files[0])}
+          />
+          {file ? "Change File" : "Choose PDF"}
+        </label>
+
+        {/* Selected file preview */}
+        {file && (
+          <div className="file-preview">
+            <span className="file-icon">📄</span>
+            <span className="file-name">{file.name}</span>
+          </div>
+        )}
+
+        {/* Upload / Update button */}
 
         <button onClick={handleUpload} disabled={loading}>
-          {loading ? "Uploading..." : "Upload Resume"}
+          {loading
+            ? "Uploading..."
+            : uploaded
+              ? "Update Resume"
+              : "Upload Resume"}
+        </button>
+
+        {/* Start Interview button */}
+
+        <button
+          className="start-interview-btn"
+          disabled={!uploaded}
+          onClick={startInterview}
+        >
+          Start Interview
         </button>
       </div>
     </div>

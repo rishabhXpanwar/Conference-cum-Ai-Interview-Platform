@@ -7,7 +7,7 @@
 }
 
 .resume-box {
-  background: white;
+  background: black;
   padding: 40px;
   border-radius: 12px;
   width: 400px;
@@ -21,8 +21,47 @@
   margin: 0;
 }
 
-.resume-box input {
-  padding: 10px;
+.file-input-label {
+  display: inline-block;
+  padding: 10px 18px;
+  background: #eff6ff;
+  color: #2563eb;
+  border: 2px dashed #2563eb;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.file-input-label:hover {
+  background: #dbeafe;
+}
+
+.file-input-label input {
+  display: none;
+}
+
+.file-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  word-break: break-all;
+}
+
+.file-icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.file-name {
+  font-size: 0.875rem;
+  color: #166534;
+  font-weight: 500;
+  text-align: left;
 }
 
 .resume-box button {
@@ -32,4 +71,27 @@
   background: #2563eb;
   color: white;
   cursor: pointer;
+}
+
+
+.start-interview-btn {
+
+  margin-top: 12px;
+  padding: 12px;
+
+  background: #16a34a;
+  color: white;
+
+  border: none;
+  border-radius: 8px;
+
+  cursor: pointer;
+
+}
+
+.start-interview-btn:disabled {
+
+  background: #9ca3af;
+  cursor: not-allowed;
+
 }

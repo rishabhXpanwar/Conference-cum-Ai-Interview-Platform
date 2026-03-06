@@ -1,5 +1,6 @@
 import AIInterview from "../models/aiInterview.model.js";
 import Resume from "../models/resume.model.js";
+import { transporter } from "../utils/mailer.js";
 import { generateInterviewQuestion, generateInterviewScore } from "../services/interviewService.js";
 
 
@@ -14,27 +15,41 @@ const generateAiCode = () => {
 ===================================================== */
 export const createAIInterview = async (req, res) => {
   try {
-    
     if (req.user.role !== "interviewer" && req.user.role !== "admin") {
       return res.status(403).json({
         message: "Upgrade plan to create AI interview",
       });
     }
 
-    const { jobRole , note } = req.body;
+    const { jobRole, note } = req.body;
     const aiCode = generateAiCode();
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
     const interview = await AIInterview.create({
       aiCode,
-      interviewer : req.user._id,
+      expiresAt,
+      interviewer: req.user._id,
       jobRole,
       note,
-      status : "created",
+      status: "created",
+    });
+
+    // send mail to host with meeting code
+    await transporter.sendMail({
+      from: '"Meet App AI" <anmolearn2120@gmail.com>',
+      to: req.user.email,
+      subject: "Your AI Interview Code",
+      html: `
+                <h2>Meeting Details</h2>
+                <p><b>Code:</b> ${aiCode}</p>
+                <p><b>Expires:</b> ${expiresAt}</p>
+                <p>Share this code with your candidate to start the AI interview.</p>
+                `,
     });
 
     res.status(201).json({
-      message : "AI Interview Created",
+      message: "AI Interview Created",
       aiCode,
-      interviewId : interview._id
+      interviewId: interview._id,
     });
   } catch (error) {
     console.error("CREATE AI INTERVIEW ERROR:", error);
@@ -68,7 +83,10 @@ export const verifyAIInterview = async (req,res) => {
     
       if(interview.status === "completed")
         return res.status(400).json({message : "Interview already completed"});
-    
+    if (!interview.candidate) {
+      interview.candidate = req.user._id;
+      await interview.save();
+    }
     res.status(200).json({
       message : "AI Interview Code Verified",
       interviewId : interview._id,

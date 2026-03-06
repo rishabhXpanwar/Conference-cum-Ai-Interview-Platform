@@ -8,6 +8,11 @@ const aiInterviewSchema = new mongoose.Schema(
       unique: true,
     },
 
+    expiresAt: {
+    type: Date,
+    required: true
+  },
+
     interviewer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

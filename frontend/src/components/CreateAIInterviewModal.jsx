@@ -98,6 +98,10 @@ export default function CreateAIInterviewModal({ close }) {
               <button className="ai-btn" onClick={shareCode}>
                 Share
               </button>
+
+              <button className="ai-btn-secondary" onClick={close}>
+                Close
+              </button>
             </div>
           </div>
         )}
