@@ -11,7 +11,7 @@ import Pricing from "./pages/Pricing";
 import ProtectedRoute from "./components/protectedRoutes";
 import Background from "./components/Background";
 import Navbar from "./components/Navbar";
-import AIActivity from "./pages/AiActivity";
+import AIActivity from "./pages/AIActivity";
 import ResumeUpload from "./pages/ResumeUpload.jsx";
 import AiMeetingRoom from "./pages/AiMeetingRoom.jsx"
 
