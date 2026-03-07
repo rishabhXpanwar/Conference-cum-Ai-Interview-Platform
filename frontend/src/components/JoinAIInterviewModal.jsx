@@ -32,6 +32,12 @@ export default function JoinAIInterviewModal({ close }) {
       status
       */
 
+      if (res.data.status === "active") {
+  navigate(`/ai/room/${aiCode}`, {
+    state: { interviewId: res.data.interviewId }
+  });
+} else {
+  
       // navigate to resume upload
       navigate(`/ai/upload-resume/${aiCode}`, {
         state: {
@@ -40,6 +46,7 @@ export default function JoinAIInterviewModal({ close }) {
           interviewer: data.interviewer,
         },
       });
+    }
     } catch (err) {
       alert(err.response?.data?.message || "Failed to verify interview code");
     } finally {

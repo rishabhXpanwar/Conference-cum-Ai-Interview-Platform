@@ -25,6 +25,11 @@ const aiInterviewSchema = new mongoose.Schema(
       
     },
 
+    autoCompleteAt: {
+  type: Date,
+  default: null,
+},
+
     note : {
         type : String,
     },

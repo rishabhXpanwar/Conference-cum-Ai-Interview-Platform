@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import socket from "../socket";
+
+import aisocket from "../../socketAI";
 import "../styles/AiMeetingRoom.css";
 
 import MicWaveform from "../components/MicWaveForm";
 import AiWaveform from "../components/AiWaveForm";
 
 import * as faceapi from "face-api.js";
+import * as tf from "@tensorflow/tfjs";
 
 
 export default function AiMeetingRoom () {
@@ -22,7 +24,13 @@ export default function AiMeetingRoom () {
     const peerConnections = useRef({});
     const recognitionRef = useRef(null);
     const attentionInterval = useRef(null);
-
+  const silenceTimer = useRef(null);
+  const transcriptRef = useRef("");
+  const answerSentRef = useRef(false);
+  const answerTimeout = useRef(null);
+const timerInterval = useRef(null);
+const aiStateRef = useRef("idle");
+const hasSpokenRef = useRef(false);
     
   const [remoteStreams, setRemoteStreams] = useState([]);
   const [canSpeak, setCanSpeak] = useState(false);
@@ -35,20 +43,54 @@ export default function AiMeetingRoom () {
 
   const [warning, setWarning] = useState("");
 
+  const [responseTimer, setResponseTimer] = useState(20);
+  const [hasStartedSpeaking, setHasStartedSpeaking] = useState(false);
+  const [micStream, setMicStream] = useState(null);
+
+  const [timerNotice, setTimerNotice] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(null);
+  const [isWarning, setIsWarning] = useState(false);
+
   const role = user.role === "interviewer" ? "interviewer" : "candidate";
 
 
+  const loadModels = async () => {
+    try {
+      await tf.setBackend("cpu");
+      await tf.ready();
+
+      await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
+      await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
+
+      console.log("FaceAPI models loaded");
+    } catch (err) {
+      console.error("FaceAPI model load error:", err);
+    }
+  };
+
   const initCamera = async () => {
-    if (role === "candidate") {
+    if (role !== "candidate") return;
+
+    try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
       });
 
       localStream.current = stream;
-      localVideoRef.current.srcObject = stream;
+      setMicStream(stream);
+
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = stream;
+      }
 
       startAttentionDetection();
+    } catch (err) {
+      console.error("Camera/Mic error:", err);
+
+      alert(
+        "Camera or microphone not detected. Please check your device permissions.",
+      );
     }
   };
 
@@ -61,7 +103,7 @@ export default function AiMeetingRoom () {
 
       const detections = await faceapi.detectAllFaces(
         localVideoRef.current,
-        new faceapi.TinyFaceDetectorOptions(),
+        new faceapi.TinyFaceDetectorOptions({ inputSize: 224 }),
       );
 
       if (detections.length === 0) {
@@ -78,30 +120,39 @@ export default function AiMeetingRoom () {
     await initCamera();
   };
 
+
+  useEffect(() => {
+  aiStateRef.current = aiState;
+}, [aiState]);
+
   useEffect(() => {
 
-    socket.connect();
-
-    socket.emit("join-ai-room" , {
+    aisocket.connect();
+console.log("AI CODE:", aiCode);
+    aisocket.emit("join-ai-room" , {
         aiCode,
         role,
         userId : user._id,
 
     });
 
-    socket.on("ai-joined", ({interviewId}) => {
-        setInterviewId(interviewId);
+    aisocket.on("ai-joined", ({ interviewId }) => {
+      setInterviewId(interviewId);
+
+      // start AI interview
+      aisocket.emit("ai:start", { interviewId });
+      console.log("AI START EMITTED");
     });
 
 
-    socket.on("ai-user-joined" , async({ socketId , role}) => {
+    aisocket.on("ai-user-joined" , async({ socketId , role}) => {
         if(role === "interviewer")
         {
             const pc = createPeerConnection(socketId);
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
 
-            socket.emit("ai-offer" , {
+            aisocket.emit("ai-offer" , {
                 to : socketId,
                 offer
             });
@@ -110,53 +161,137 @@ export default function AiMeetingRoom () {
     });
 
 
-    socket.on("ai-offer", async({ from , offer})=> {
+    aisocket.on("ai-offer", async({ from , offer})=> {
         const pc = createPeerConnection(from);
         await pc.setRemoteDescription(new RTCSessionDescription(offer));
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
 
-        socket.emit("ai-answer" , {
+        aisocket.emit("ai-answer" , {
             to : from,
             answer
         });
     });
 
 
-    socket.on("ai-answer" , async({from , answer}) => {
+    aisocket.on("ai-answer" , async({from , answer}) => {
         const pc = peerConnections.current[from];
         if(pc)
              await pc.setRemoteDescription(new RTCSessionDescription(answer));
     });
 
 
-    socket.on("ai-ice-candidate" , async({from , candidate})=> {
+    aisocket.on("ai-ice-candidate" , async({from , candidate})=> {
         const pc = peerConnections.current[from];
 
         if(pc)
              await pc.addIceCandidate(new RTCIceCandidate(candidate));
     });
 
-    socket.on("ai:speaking", ({ question }) => {
-      setAiState("speaking");
-      setQuestion(question);
 
-      setCanSpeak(false);
+    aisocket.on("ai:timer-started", ({ autoCompleteAt, remainingTime }) => {
 
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-      }
+  const minutes = Math.floor(remainingTime / 60000);
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
 
-      speak(question);
+  let message;
+
+  if (hours >= 1 && mins >= 59) {
+    message = "Please complete the interview within 2 hours.";
+  } else {
+    message = `Interview resumed. Time remaining: ${hours}h ${mins}m`;
+  }
+
+  setTimerNotice(message);
+
+  setTimeout(() => {
+    setTimerNotice(null);
+  }, 6000);
+
+
+  const end = new Date(autoCompleteAt).getTime();
+
+  const updateTimer = () => {
+    const now = Date.now();
+    const diff = end - now;
+
+    if (diff <= 0) {
+  setTimeLeft("00:00:00");
+
+  if (timerInterval.current) {
+    clearInterval(timerInterval.current);
+  }
+
+  return;
+}
+
+// 🔴 last 10 minutes warning
+if (diff <= 10 * 60 * 1000) {
+  setIsWarning(true);
+}
+
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+
+    setTimeLeft(
+      `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`
+    );
+  };
+
+  updateTimer();
+
+if (timerInterval.current) {
+  clearInterval(timerInterval.current);
+}
+
+timerInterval.current = setInterval(updateTimer, 1000);
+});
+
+
+
+    aisocket.on("ai:speaking", ({ question }) => {
+  console.log("AI QUESTION RECEIVED:", question);
+
+  setAiState("speaking");
+  setQuestion(question);
+
+  // ✅ YAHAN CLEAR KARO TRANSCRIPT AUR FLAGS KO
+  transcriptRef.current = ""; 
+  answerSentRef.current = false;
+  hasSpokenRef.current = false;
+  setHasStartedSpeaking(false);
+  setResponseTimer(20);
+
+  if (answerTimeout.current) clearTimeout(answerTimeout.current);
+  if (silenceTimer.current) clearTimeout(silenceTimer.current);
+
+  if (recognitionRef.current) {
+    try {
+      recognitionRef.current.abort();
+    } catch {}
+  }
+
+  speak(question);
+});
+
+    
+
+
+    aisocket.on("ai-error", ({ message }) => {
+      console.error("AI error:", message);
+      alert(message);
     });
-
-    socket.on("ai:thinking", () => {
+    aisocket.on("ai:thinking", () => {
       setAiState("thinking");
       setCanSpeak(false);
 
-      localStream.current.getAudioTracks().forEach((track) => {
-        track.enabled = false;
-      });
+      if (localStream.current) {
+        localStream.current.getAudioTracks().forEach((track) => {
+          track.enabled = false;
+        });
+      }
 
 
       if (recognitionRef.current) {
@@ -166,16 +301,12 @@ export default function AiMeetingRoom () {
 
     });
 
-    socket.on("ai-completed" , ({score}) => {
+    aisocket.on("ai-completed" , ({score}) => {
         alert("Interview Completed");
         navigate("/ai/activity");
     });
 
-    const loadModels = async () => {
-      await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
-      await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
-    };
-
+    
     setup();
 
     return ()=> cleanup();
@@ -183,6 +314,17 @@ export default function AiMeetingRoom () {
 
 
   } , []);
+
+
+ useEffect(() => {
+   if (aiState !== "listening" || hasStartedSpeaking) return;
+
+   const interval = setInterval(() => {
+     setResponseTimer((t) => (t > 0 ? t - 1 : 0));
+   }, 1000);
+
+   return () => clearInterval(interval);
+ }, [aiState, hasStartedSpeaking]);
 
   
 
@@ -223,7 +365,7 @@ export default function AiMeetingRoom () {
     pc.onicecandidate = (event) => {
         if(event.candidate)
         {
-            socket.emit("ai-ice-candidate" , {
+            aisocket.emit("ai-ice-candidate" , {
                 to : socketId,
                 candidate : event.candidate
             });
@@ -233,20 +375,50 @@ export default function AiMeetingRoom () {
     return pc;
 
   };
+const startNoResponseTimer = () => {
+  if (answerTimeout.current) {
+    clearTimeout(answerTimeout.current);
+  }
 
+  answerTimeout.current = setTimeout(() => {
+    if (hasSpokenRef.current) return;
+
+    console.log("No response detected");
+
+    aisocket.emit("ai:answer", {
+      interviewId,
+      answer: "No response",
+    });
+
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.abort();
+      } catch {}
+    }
+  }, 20000);
+};
 
   const speak = (text) => {
+
+    if (speechSynthesis.speaking) {
+  speechSynthesis.cancel();
+}
+
     const utterance = new SpeechSynthesisUtterance(text);
 
     utterance.onend = () => {
-      setAiState("listening");
-      setCanSpeak(true);
+  setAiState("listening");
+  setCanSpeak(true);
 
-      localStream.current.getAudioTracks().forEach((track) => {
-        track.enabled = true;
-      });
-      startListening();
-    };
+  if (localStream.current?.getAudioTracks) {
+    localStream.current.getAudioTracks().forEach((track) => {
+      track.enabled = true;
+    });
+  }
+
+  startListening();
+  startNoResponseTimer(); // 👈 start timer here
+};
 
     speechSynthesis.speak(utterance);
   };
@@ -274,46 +446,139 @@ export default function AiMeetingRoom () {
 
   
   const startListening = () => {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    if (!SpeechRecognition) {
-      alert("Speech Recognition not supported");
-      return;
-    }
+  if (!SpeechRecognition) {
+    alert("Speech Recognition not supported");
+    return;
+  }
 
-    const recognition = new SpeechRecognition();
+  if (recognitionRef.current) {
+    try {
+      recognitionRef.current.abort();
+    } catch {}
+  }
 
-    recognition.lang = "en-US";
-    recognition.continuous = true;
-    recognition.interimResults = false;
+  const recognition = new SpeechRecognition();
 
-    recognition.onend = () => {
-      if (canSpeak) {
-        recognition.start();
-      }
-    };
+  recognition.lang = "en-US";
+  recognition.continuous = true;
+  // ✅ Pura game yahan hai: Isko TRUE karna hai
+  recognition.interimResults = true; 
 
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-
-      socket.emit("ai:answer", {
-        interviewId,
-        answer: transcript,
-      });
-    };
-
-
-    recognition.start();
-    recognition.onerror = (e) => {
-      console.log("speech error", e);
-    };
-
-    recognitionRef.current = recognition;
+  recognition.onstart = () => {
+    console.log("🎤 Speech recognition started");
   };
 
+  // ✅ NAYA EVENT: Jaise hi aawaz detect hogi (bina word process hue), timer cancel!
+  recognition.onspeechstart = () => {
+    console.log("🗣️ Speech detected! Cancelling 20s timer...");
+    if (!hasSpokenRef.current) {
+      hasSpokenRef.current = true;
+      setHasStartedSpeaking(true);
+
+      if (answerTimeout.current) {
+        clearTimeout(answerTimeout.current);
+        console.log("🛑 20 sec No-Response timer cancelled (via speechstart)!");
+      }
+    }
+  };
+
+  recognition.onresult = (event) => {
+    // ⏱️ Backup: Agar onspeechstart miss ho jaye, toh interim result aate hi timer cancel karo
+    if (!hasSpokenRef.current) {
+      hasSpokenRef.current = true;
+      setHasStartedSpeaking(true);
+
+      if (answerTimeout.current) {
+        clearTimeout(answerTimeout.current);
+        console.log("🛑 20 sec No-Response timer cancelled (via onresult)!");
+      }
+    }
+
+    // 🧠 Transcript me sirf FINAL words add karenge taaki duplicate na ho
+    let finalTranscriptChunk = "";
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      if (event.results[i].isFinal) {
+        finalTranscriptChunk += event.results[i][0].transcript + " ";
+      }
+    }
+
+    if (finalTranscriptChunk.trim() !== "") {
+      console.log("🗣️ Final word processed:", finalTranscriptChunk);
+      transcriptRef.current += finalTranscriptChunk;
+    }
+
+    // ⏱️ Har interim aur final word pe 7-sec silence timer reset karo
+    // Isse jab tak tum bolte rahoge (chahe atak-atak ke), AI wait karega
+    if (silenceTimer.current) {
+      clearTimeout(silenceTimer.current);
+    }
+
+    silenceTimer.current = setTimeout(() => {
+      console.log("⏳ 7 seconds silence detected. Sending answer...");
+      sendAnswer(recognition);
+    }, 7000);
+  };
+
+  recognition.onerror = (e) => {
+    if (e.error === "aborted" || e.error === "no-speech") return;
+    console.log("⚠️ Speech error:", e.error);
+  };
+
+  recognition.onend = () => {
+    console.log("🛑 Speech recognition ended (Chrome stopped it)");
+
+    if (answerSentRef.current) return;
+    if (aiStateRef.current !== "listening") return;
+
+    setTimeout(() => {
+      if (!answerSentRef.current && aiStateRef.current === "listening") {
+        startListening(); 
+      }
+    }, 300);
+  };
+
+  recognitionRef.current = recognition;
+  
+  try {
+    recognition.start();
+  } catch(e) {
+    console.error("Failed to start recognition", e);
+  }
+};
+
+  
+  const sendAnswer = (recognition) => {
+    if (answerSentRef.current) return;
+
+    const answer = transcriptRef.current.trim() || "No response";
+
+    answerSentRef.current = true;
+
+    console.log("Sending answer:", answer);
+
+    aisocket.emit("ai:answer", {
+      interviewId,
+      answer,
+    });
+
+    transcriptRef.current = "";
+
+    if (silenceTimer.current) clearTimeout(silenceTimer.current);
+    if (answerTimeout.current) clearTimeout(answerTimeout.current);
+
+    recognition.stop();
+  };
 
   const cleanup = () => {
+
+
+    if (timerInterval.current) {
+  clearInterval(timerInterval.current);
+}
+
+
     // stop AI speech
     speechSynthesis.cancel();
 
@@ -337,10 +602,14 @@ export default function AiMeetingRoom () {
     peerConnections.current = {};
 
     // remove socket listeners
-    socket.removeAllListeners();
+  aisocket.off("ai:speaking");
+aisocket.off("ai:thinking");
+aisocket.off("ai:timer-started");
+aisocket.off("ai-error");
+aisocket.off("ai-completed");
 
     // disconnect socket
-    socket.disconnect();
+    aisocket.disconnect();
   };
 
   const leaveInterview = () => {
@@ -352,16 +621,40 @@ export default function AiMeetingRoom () {
 };
 
   return (
+    
     <div className="ai-room">
       <div className="ai-top">
+        {/* 🔔 Notification */}
+{timerNotice && (
+  <div className="ai-timer-notice">
+    ⏳ {timerNotice}
+  </div>
+)}
+
+{/* ⏳ Timer */}
+{timeLeft && (
+  <div className={`interview-timer ${isWarning ? "timer-warning" : ""}`}>
+    ⏳ Time Remaining: {timeLeft}
+  </div>
+)}
+
         <div className={`ai-avatar ${aiState}`}>
-          AI
+          {aiState === "thinking" && <span>🤔 Thinking...</span>}
+          {aiState === "speaking" && <span>AI</span>}
+
           <AiWaveform active={aiState === "speaking"} />
         </div>
-        
 
         <div className="ai-question">
-          {question || "Waiting for interview to start"}
+          {aiState === "thinking"
+            ? "AI is thinking..."
+            : question || "Waiting for interview to start"}
+
+          {aiState === "listening" && !hasStartedSpeaking && (
+            <div className="response-timer">
+              Please start responding in {responseTimer}s
+            </div>
+          )}
         </div>
       </div>
 
@@ -393,7 +686,7 @@ export default function AiMeetingRoom () {
 
       {aiState === "listening" && (
         <div className="candidate-wave">
-          <MicWaveform stream={localStream.current} />
+          <MicWaveform stream={micStream} />
 
           <p>Listening...</p>
         </div>

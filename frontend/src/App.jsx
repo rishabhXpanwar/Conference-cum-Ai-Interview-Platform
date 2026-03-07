@@ -7,10 +7,11 @@ import Dashboard from "./pages/Dashboard";
 import AIDashboard from "./pages/AIDashboard.jsx";
 import MeetingRoom from "./pages/MeetingRoom";
 import Activity from "./pages/Activity";
+import Pricing from "./pages/Pricing";
 import ProtectedRoute from "./components/protectedRoutes";
 import Background from "./components/Background";
 import Navbar from "./components/Navbar";
-import AIActivity from "./pages/AIActivity";
+import AIActivity from "./pages/AiActivity";
 import ResumeUpload from "./pages/ResumeUpload.jsx";
 import AiMeetingRoom from "./pages/AiMeetingRoom.jsx"
 
@@ -24,6 +25,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/pricing" element={<Pricing />} />
 
           {/* Protected Routes */}
           <Route
@@ -78,7 +80,7 @@ function App() {
             }
           />
           <Route
-            path="/ai/room/:aicode"
+            path="/ai/room/:aiCode"
             element={
               <ProtectedRoute>
                 <AiMeetingRoom />

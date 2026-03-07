@@ -23,7 +23,8 @@ export const createAIInterview = async (req, res) => {
 
     const { jobRole, note } = req.body;
     const aiCode = generateAiCode();
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
+    // 5 days = 5 din * 24 ghante * 60 minute * 60 second * 1000 milliseconds
+    const expiresAt = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
     const interview = await AIInterview.create({
       aiCode,
       expiresAt,
@@ -104,7 +105,7 @@ export const verifyAIInterview = async (req,res) => {
 
 export const getCreatedAIInterviews = async (req,res) => {
     try {
-      if (req.user.role !== "interviewer")
+      if (req.user.role !== "interviewer" && req.user.role !== "admin")
         return res.status(403).json({ message: "Access Denied" });
 
       const interviews = await AIInterview.find({

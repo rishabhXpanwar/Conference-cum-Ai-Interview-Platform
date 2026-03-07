@@ -1,15 +1,18 @@
 // import swaggerUi from "swagger-ui-express";
 // import swaggerSpec from "./src/config/swagger.js";
+import dotenv from "dotenv";
+dotenv.config();
 
+import { connectToSocket } from "./src/controllers/socketManager.js";
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
+
 import { createServer } from "node:http";
 import { Server } from "socket.io";
 
 import { connectDB } from "./src/config/db.js";
 
-import { connectToSocket } from "./src/controllers/socketManager.js";
+
 import router from "./src/routes/users.routes.js";
 
 import userRoutes from "./src/routes/users.routes.js";
@@ -20,7 +23,10 @@ import aiInterviewRoutes from "./src/routes/aiInterview.routes.js";
 import meetingRoutes from "./src/routes/meeting.routes.js";
 import activityRoutes from "./src/routes/activity.routes.js";
 import { transporter } from "./src/utils/mailer.js";
-dotenv.config();
+import AIInterview from "./src/models/aiInterview.model.js";
+import Resume from "./src/models/resume.model.js";
+import { generateInterviewScore } from "./src/services/interviewService.js";
+import  parseScore  from "./src/utils/parseScore.js";
 
 const app = express();
 
@@ -61,7 +67,52 @@ const startServer = async () => {
       if (err) console.log("SMTP ERROR:", err);
       else console.log("SMTP READY");
     });
+
+    /* ======================================
+     AUTO COMPLETE CHECKER
+  ====================================== */
+setInterval(async () => {
+  try {
+
+    const expired = await AIInterview.find({
+      status: "active",
+      autoCompleteAt: { $lt: new Date() },
+    });
+
+    for (const interview of expired) {
+
+      const resume = await Resume.findOne({
+        user: interview.candidate,
+      });
+
+      if (!resume) continue;
+
+      const scoreText = await generateInterviewScore({
+        summary: resume.summary,
+        questions: interview.questions,
+      });
+
+      interview.score = parseScore(scoreText);
+      interview.status = "completed";
+      interview.autoCompleteAt = null;
+
+      await interview.save();
+
+      console.log("Auto completed interview:", interview._id);
+    }
+
+  } catch (err) {
+    console.error("Auto completion error:", err);
+  }
+
+}, 60000); // every 1 minute
+
+
+
+
   });
+
+
 };
 
 startServer();

@@ -7,62 +7,57 @@ if (!apiKey) {
 
 const genAI = new GoogleGenerativeAI(apiKey);
 
-const preferredModels = (
-  process.env.GEMINI_MODEL_CANDIDATES ||
-  "gemini-2.0-flash,gemini-1.5-pro,gemini-1.5-flash"
-)
-  .split(",")
-  .map((m) => m.trim())
-  .filter(Boolean);
+const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const MAX_RESUME_CHARS = Number(process.env.GEMINI_MAX_RESUME_CHARS || 12000);
 
-let resolvedModelPromise;
+// Circuit breaker to avoid hammering Gemini when quota is exhausted.
+let skipAiUntil = 0;
 
-async function resolveWorkingModel() {
-  // If explicitly set, trust it
-  if (process.env.GEMINI_MODEL) return process.env.GEMINI_MODEL.trim();
-
-  const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
-  const resp = await fetch(url);
-
-  if (!resp.ok) {
-    const txt = await resp.text();
-    throw new Error(`ListModels failed: ${resp.status} ${resp.statusText} - ${txt}`);
-  }
-
-  const data = await resp.json();
-  const available = (data.models || [])
-    .filter((m) => (m.supportedGenerationMethods || []).includes("generateContent"))
-    .map((m) => m.name.replace(/^models\//, ""));
-
-  const picked =
-    preferredModels.find((m) => available.includes(m)) ||
-    available[0];
-
-  if (!picked) {
-    throw new Error("No generateContent-capable model found for this API key/project.");
-  }
-
-  console.log("Gemini model selected:", picked);
-  return picked;
+function extractRetryDelayMs(message = "") {
+  const match = message.match(/retry in\s*([\d.]+)s/i);
+  if (!match) return 60000;
+  const seconds = Number(match[1]);
+  if (!Number.isFinite(seconds) || seconds <= 0) return 60000;
+  return Math.ceil(seconds * 1000);
 }
 
-async function getResolvedModel() {
-  if (!resolvedModelPromise) {
-    resolvedModelPromise = resolveWorkingModel();
-  }
-  return resolvedModelPromise;
+function isQuotaError(message = "") {
+  return (
+    message.includes("429") ||
+    message.toLowerCase().includes("quota exceeded") ||
+    message.toLowerCase().includes("too many requests")
+  );
 }
 
 export const generateResumeSummary = async (resumeText) => {
-  const modelName = await getResolvedModel();
-  const model = genAI.getGenerativeModel({ model: modelName });
+  if (Date.now() < skipAiUntil) {
+  throw new Error("AI_BUSY");
+}
+
+  const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+  const safeText = String(resumeText || "").slice(0, MAX_RESUME_CHARS);
 
   const prompt = `
 You are an expert resume reviewer.
 Summarize this resume in concise bullet points:
-${resumeText}
+${safeText}
 `;
 
-  const result = await model.generateContent(prompt);
-  return result.response.text();
+  try {
+    const result = await model.generateContent(prompt);
+    return result.response.text();
+  } catch (err) {
+    const msg = err?.message || "";
+
+    if (isQuotaError(msg)) {
+      const delayMs = extractRetryDelayMs(msg);
+      skipAiUntil = Date.now() + delayMs;
+      console.warn(
+        `Gemini quota/rate limit reached. Skipping AI calls for ${Math.ceil(delayMs / 1000)}s.`
+      );
+      throw new Error("AI_BUSY");
+    }
+
+    throw err;
+  }
 };

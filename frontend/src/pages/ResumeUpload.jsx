@@ -19,7 +19,9 @@ export default function ResumeUpload() {
   ============================== */
 
   const handleUpload = async () => {
-    if (!file) {
+    if (loading) return;
+
+if (!file) {
       alert("Please select a resume");
       return;
     }
@@ -36,12 +38,23 @@ export default function ResumeUpload() {
         },
       });
 
-      alert("Resume uploaded successfully");
+      alert("Resume uploaded successfully. You can now start the interview.");
 
       setUploaded(true);
     } catch (err) {
-      alert(err.response?.data?.message || "Resume upload failed");
-    } finally {
+
+  if (err.response?.status === 503) {
+    alert("AI is busy. Please retry after some time.");
+    return;
+  }
+
+  if (err.response?.status === 400) {
+    alert(err.response.data.message);
+    return;
+  }
+
+  alert("Resume upload failed. Please try again.");
+} finally {
       setLoading(false);
     }
   };
@@ -67,7 +80,26 @@ export default function ResumeUpload() {
           <input
             type="file"
             accept=".pdf"
-            onChange={(e) => setFile(e.target.files[0])}
+            onChange={(e) => {
+
+  const selectedFile = e.target.files[0];
+
+  if (!selectedFile) return;
+
+  if (selectedFile.type !== "application/pdf") {
+    alert("Only PDF resumes are allowed");
+    return;
+  }
+
+  if (selectedFile.size > 5 * 1024 * 1024) {
+    alert("Resume must be less than 5MB");
+    return;
+  }
+
+  setFile(selectedFile);
+  setUploaded(false);
+
+}}
           />
           {file ? "Change File" : "Choose PDF"}
         </label>

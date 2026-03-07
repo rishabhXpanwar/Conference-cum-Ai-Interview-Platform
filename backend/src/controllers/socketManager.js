@@ -224,24 +224,11 @@ import {
   generateInterviewScore,
 } from "../services/interviewService.js";
 
+import parseScore from "../utils/parseScore.js";
 
 
 
 
-//parse Gemini response for score
-const parseScore = (text) => {
-  const tech = text.match(/TECHNICAL:\s*(\d+)/);
-  const comm = text.match(/COMMUNICATION:\s*(\d+)/);
-  const overall = text.match(/OVERALL:\s*(\d+)/);
-  const feedback = text.match(/FEEDBACK:\s*([\s\S]*)/);
-
-  return {
-    technical: tech ? Number(tech[1]) : 0,
-    communication: comm ? Number(comm[1]) : 0,
-    overall: overall ? Number(overall[1]) : 0,
-    feedback: feedback ? feedback[1].trim() : "",
-  };
-};
 
 
 
@@ -513,6 +500,7 @@ export const connectToSocket = (server) => {
         userId,
         role,
         aiCode,
+        interviewId: interview._id,
       };
 
       //join the room
@@ -560,56 +548,149 @@ export const connectToSocket = (server) => {
     /* =====================================================
         Start AI Interview
       ===================================================== */
+socket.on("ai:start", async ({ interviewId }) => {
+  console.log("AI START RECEIVED:", interviewId);
 
-    socket.on("ai:start", async ({ interviewId }) => {
-      const session = aiSessions[socket.id];
+  const session = aiSessions[socket.id];
 
-      if (!session || session.role !== "candidate")
-        return socket.emit("ai-error", {
-          message: "Unauthorized to start interview",
-        });
-
-      const interview = await AIInterview.findById(interviewId);
-      if (!interview)
-        return socket.emit("ai-error", { message: "Interview not found" });
-
-      const resume = await Resume.findOne({ user: interview.candidate });
-
-      if (!resume) {
-        return socket.emit("ai-error", {
-          message: "Please upload resume before starting interview",
-        });
-      }
-
-      const first = await generateInterviewQuestion({
-        summary: resume.summary,
-        phase: interview.phase,
-        history: [],
-        allowFollowUp: false,
-      });
-
-      interview.questions.push({
-        type: first.type,
-        question: first.question,
-      });
-
-      interview.mainQuestionCount = 1;
-      interview.status = "active";
-
-      await interview.save();
-
-      aiNamespace.to(session.aiCode).emit("ai-speaking", {
-        question: first.question,
-        type: first.type,
-      });
+  if (!session || session.role !== "candidate") {
+    return socket.emit("ai-error", {
+      message: "Unauthorized to start interview",
     });
+  }
+
+  const interview = await AIInterview.findById(interviewId);
+
+  if (!interview) {
+    return socket.emit("ai-error", {
+      message: "Interview not found",
+    });
+  }
+
+  // Interview already completed
+  if (interview.status === "completed") {
+    return socket.emit("ai-error", {
+      message: "Interview already completed",
+    });
+  }
+
+  /* ==============================
+     START 2 HOUR TIMER (ONLY ONCE)
+  ============================== */
+
+  if (!interview.autoCompleteAt) {
+    interview.autoCompleteAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
+  }
+
+  /* ==============================
+     RESUME ACTIVE INTERVIEW
+  ============================== */
+
+  if (interview.status === "active") {
+    await interview.save(); // save timer if just set
+
+    const remainingTime =
+    new Date(interview.autoCompleteAt).getTime() - Date.now();
+
+  aiNamespace.to(session.aiCode).emit("ai:timer-started", {
+    autoCompleteAt: interview.autoCompleteAt,
+    remainingTime,
+  });
+
+    const lastQuestion =
+      interview.questions[interview.questions.length - 1];
+
+    if (lastQuestion) {
+      aiNamespace.to(session.aiCode).emit("ai:speaking", {
+        question: lastQuestion.question,
+        type: lastQuestion.type,
+      });
+    }
+
+    return;
+  }
+
+  /* ==============================
+     CHECK RESUME
+  ============================== */
+
+  const resume = await Resume.findOne({ user: interview.candidate });
+
+  if (!resume) {
+    return socket.emit("ai-error", {
+      message: "Please upload resume before starting interview",
+    });
+  }
+
+  console.log("Generating first question...");
+
+
+  //----------------------------------------------------------------------------------
+// first question generate krte hai
+//-----------------------------------------------------------------------------------------
+
+
+  let first;
+
+try {
+
+  first = await generateInterviewQuestion({
+    summary: resume.summary,
+    phase: interview.phase,
+    history: [],
+    allowFollowUp: false,
+  });
+
+} catch (err) {
+
+  if (err.message === "AI_BUSY") {
+    return socket.emit("ai-error", {
+      message: "AI is busy. Please try again after some time.",
+    });
+  }
+
+  console.error("AI question generation failed:", err);
+
+  return socket.emit("ai-error", {
+    message: "Failed to generate interview question.",
+  });
+}
+
+  console.log("First question:", first);
+
+  interview.questions.push({
+    type: first.type,
+    question: first.question,
+  });
+
+  interview.mainQuestionCount = 1;
+  interview.status = "active";
+
+  await interview.save();
+
+  const remainingTime =
+  new Date(interview.autoCompleteAt).getTime() - Date.now();
+
+aiNamespace.to(session.aiCode).emit("ai:timer-started", {
+  autoCompleteAt: interview.autoCompleteAt,
+  remainingTime,
+});
+
+  console.log("EMITTING QUESTION:", first.question);
+
+  aiNamespace.to(session.aiCode).emit("ai:speaking", {
+    question: first.question,
+    type: first.type,
+  });
+});
 
     /* =====================================================
    ANSWER
 ===================================================== */
 
-    socket.on("ai:answer", async ({ interviewId, answer }) => {
+    socket.on("ai:answer", async ({ answer }) => {
       try {
+        console.log("AI ANSWER RECEIVED:", answer);
         const session = aiSessions[socket.id];
 
         // Only candidate allowed
@@ -619,7 +700,9 @@ export const connectToSocket = (server) => {
           });
         }
 
-        const interview = await AIInterview.findById(interviewId);
+        
+
+        const interview = await AIInterview.findById(session.interviewId);
 
         if (!interview || interview.status === "completed") {
           return socket.emit("ai-error", {
@@ -646,7 +729,7 @@ export const connectToSocket = (server) => {
             message: "Question already answered",
           });
         }
-
+        console.log("Saving answer...", answer);
         lastQuestion.answer = answer;
 
         await interview.save();
@@ -699,8 +782,8 @@ export const connectToSocket = (server) => {
         /* ==========================================
        AI TYPING
     ========================================== */
-
-        aiNamespace.to(session.aiCode).emit("ai:typing");
+      console.log("NEXT QUESTION:", next.question);
+        //aiNamespace.to(session.aiCode).emit("ai:typing");
 
         /* ==========================================
        SAVE QUESTION TO DB
@@ -748,26 +831,26 @@ export const connectToSocket = (server) => {
         End AI Interview
       ===================================================== */
     socket.on("disconnect", () => {
-      const session = aiSessions[socket.id];
+  const session = aiSessions[socket.id];
 
-      if (!session) return;
+  if (!session) return;
 
-      const { aiCode } = session;
+  const { aiCode } = session;
 
-      if (aiConnections[aiCode]) {
-        aiConnections[aiCode].delete(socket.id);
+  if (aiConnections[aiCode]) {
+    aiConnections[aiCode].delete(socket.id);
 
-        socket.to(aiCode).emit("ai-user-left", socket.id);
+    socket.to(aiCode).emit("ai-user-left", socket.id);
 
-        if (aiConnections[aiCode].size === 0) {
-          delete aiConnections[aiCode];
-        }
-      }
+    if (aiConnections[aiCode].size === 0) {
+      delete aiConnections[aiCode];
+    }
+  }
 
-      delete aiSessions[socket.id];
+  delete aiSessions[socket.id];
 
-      console.log("AI user disconnected:", socket.id);
-    });
+  console.log("AI user disconnected:", socket.id);
+});
   });
 
   

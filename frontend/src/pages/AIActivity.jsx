@@ -9,16 +9,28 @@ export default function AIActivity() {
   const [data, setData] = useState([]);
   const [selectedInterview, setSelectedInterview] = useState(null);
 
+
   useEffect(() => {
-    if (user) fetchActivity();
-  }, [user]);
+  if (user) fetchActivity();
+}, [user]);
+  useEffect(() => {
+  const handleFocus = () => {
+    fetchActivity();
+  };
+
+  window.addEventListener("focus", handleFocus);
+
+  return () => window.removeEventListener("focus", handleFocus);
+}, []);
 
   const fetchActivity = async () => {
     try {
       let url;
 
-      if (user.role === "interviewer") url = "/api/ai/created";
-      else url = "/api/ai/my-interviews";
+      if (user.role === "interviewer" || user.role === "admin") 
+         url = "/api/ai/created";
+      else 
+         url = "/api/ai/my-interviews";
 
       const res = await API.get(url);
 
@@ -61,11 +73,12 @@ export default function AIActivity() {
             </p>
 
             <button
-              className="score-btn"
-              onClick={() => setSelectedInterview(i)}
-            >
-              View Score
-            </button>
+  className="score-btn"
+  disabled={i.status !== "completed"}
+  onClick={() => setSelectedInterview(i)}
+>
+  View Score
+</button>
           </div>
         ))}
       </div>

@@ -11,7 +11,8 @@ const generateMeetingCode = () => {
 export const createMeeting = async (req, res) => {
   try {
     const meetingCode = generateMeetingCode();
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
+    // 3 days = 3 din * 24 ghante * 60 minute * 60 second * 1000 milliseconds
+    const expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
     const meeting = await meetingModel.create({
       meetingCode: meetingCode,
       host: req.user._id,

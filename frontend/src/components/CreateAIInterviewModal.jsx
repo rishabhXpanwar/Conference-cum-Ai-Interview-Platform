@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import API from "../api/axios";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -9,15 +9,26 @@ export default function CreateAIInterviewModal({ close }) {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  const isAuthorized = user?.role === "interviewer" || user?.role === "admin";
+
   const [jobRole, setJobRole] = useState("");
   const [note, setNote] = useState("");
 
   const [createdCode, setCreatedCode] = useState("");
 
-  const createInterview = async () => {
-    /* ROLE CHECK */
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
 
-    if (user.role !== "interviewer" && user.role !== "admin") {
+    if (!isAuthorized) {
+      close?.();
+      navigate("/pricing");
+    }
+  }, [close, isAuthorized, navigate, user]);
+
+  const createInterview = async () => {
+    if (!isAuthorized) {
       navigate("/pricing");
       return;
     }
@@ -51,6 +62,10 @@ export default function CreateAIInterviewModal({ close }) {
 
     alert("Share link copied");
   };
+
+  if (user && !isAuthorized) {
+    return null;
+  }
 
   return (
     <div className="ai-modal-overlay">

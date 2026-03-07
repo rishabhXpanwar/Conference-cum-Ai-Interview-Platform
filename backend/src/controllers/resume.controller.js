@@ -41,7 +41,20 @@ const storage = multer.memoryStorage();
 
 // multer middleware for handling file uploads
 //
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB max
+  },
+  fileFilter: (req, file, cb) => {
+
+    if (file.mimetype !== "application/pdf") {
+      return cb(new Error("Only PDF resumes are allowed"), false);
+    }
+
+    cb(null, true);
+  },
+});
 
 
 
@@ -114,18 +127,45 @@ export const uploadResume = [
             // production me await fs.promises.readFile(filePath); 
 
             // now we will parse the pdf file to extract the text content
+            if (req.file.mimetype !== "application/pdf") {
+  return res.status(400).json({
+    message: "Only PDF resumes are allowed",
+  });
+}
             const pdfData = await pdfParse(req.file.buffer);
 
             const extractedText = pdfData.text;
+            if (!extractedText || extractedText.trim().length < 50) {
+    return res.status(400).json({
+        message: "Unable to read resume content. Please upload a valid resume.",
+    });
+}
 
             // generate summary using gemini (fallback to null if AI is unavailable)
-            let summary = null;
-            try {
-                console.log("Resume parsing started");
-                summary = await generateResumeSummary(extractedText);
-            } catch (aiErr) {
-                console.warn("AI summary generation failed, saving resume without summary:", aiErr.message);
-            }
+           // generate summary using Gemini
+let summary;
+
+try {
+    console.log("Resume parsing started");
+
+    summary = await generateResumeSummary(extractedText);
+
+} catch (aiErr) {
+
+    console.error("AI ERROR:", aiErr.message);
+
+    // AI quota / rate limit / busy
+    if (aiErr.message === "AI_BUSY") {
+        return res.status(503).json({
+            message: "AI is busy, please retry after some time.",
+        });
+    }
+
+    // any other AI error
+    return res.status(503).json({
+        message: "AI service unavailable. Please try again later.",
+    });
+}
 
             // save or update resume in database
             let existingResume = await Resume.findOne({ user : req.user._id});
