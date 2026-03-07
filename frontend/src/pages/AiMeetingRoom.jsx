@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
-import aisocket from "../../socketAI";
+import aisocket from "../socketAI";
 import "../styles/AiMeetingRoom.css";
 
 import MicWaveform from "../components/MicWaveForm";
