@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import API from "../api/axios";
 import { AuthContext } from "../context/AuthContext";
 import "../styles/AIActivity.css";
+import Navbar from "../components/Navbar";
 
 export default function AIActivity() {
   const { user } = useContext(AuthContext);
@@ -45,8 +46,10 @@ export default function AIActivity() {
   };
 
   return (
-    <div className="ai-activity">
-      <h1>AI Interview Activity</h1>
+    <>
+      <Navbar />
+      <div className="ai-activity">
+        <h1>AI Interview Activity</h1>
 
       <div className="ai-card-container">
         {data.map((i) => (
@@ -142,5 +145,6 @@ export default function AIActivity() {
         </div>
       )}
     </div>
+    </>
   );
 }

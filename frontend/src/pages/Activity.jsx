@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom";
 import API from "../api/axios";
+import Navbar from "../components/Navbar";
 
 import "../styles/Activity.css";
 
@@ -39,6 +40,8 @@ export default function Activity() {
 
 
   return (
+    <>
+    <Navbar />
     <div className="act-page">
       <div className="act-inner">
 
@@ -92,5 +95,6 @@ export default function Activity() {
 
       </div>
     </div>
+    </>
   );
 }

@@ -6,26 +6,33 @@ import "../styles/Dashboard.css";
 
 import { AuthContext } from "../context/AuthContext";
 
-export default function AINavbar() {
+export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
   const { user, logout } = useContext(AuthContext);
 
+  const isAIMode = location.pathname.startsWith("/ai");
+
+  const handleActivityClick = () => {
+    if (isAIMode) {
+      navigate("/ai/activity");
+    } else {
+      navigate("/activity");
+    }
+  };
+
   return (
-    <>
-      {/* ======================== NAVBAR ======================== */}
+    <nav className="dash-nav">
+      <span className="dash-nav-logo">MeetPro</span>
 
-      <nav className="dash-nav">
-        <span className="dash-nav-logo">MeetPro</span>
-
-        {/* ---- Mode Toggle ---- */}
-
+      {/* ---- Mode Toggle — only when logged in ---- */}
+      {user && (
         <div className="dash-toggle-pill">
           <span
             className={`dash-toggle-option ${
               location.pathname === "/dashboard"
-                ? " dash-toggle-option--active"
+                ? "dash-toggle-option--active"
                 : ""
             }`}
             onClick={() => navigate("/dashboard")}
@@ -36,7 +43,7 @@ export default function AINavbar() {
           <span
             className={`dash-toggle-option ${
               location.pathname === "/ai/dashboard"
-                ? " dash-toggle-option--active"
+                ? "dash-toggle-option--active"
                 : ""
             }`}
             onClick={() => navigate("/ai/dashboard")}
@@ -44,27 +51,52 @@ export default function AINavbar() {
             AI Mode
           </span>
         </div>
+      )}
 
-        <div className="dash-nav-right">
-          <span className="dash-welcome-pill">
-            Welcome, <span>{user?.name}</span>
-          </span>
+      {/* ---- Right side ---- */}
+      <div className="dash-nav-right">
 
-          <button
-            className="dash-nav-btn dash-nav-btn--ghost"
-            onClick={() => navigate("/ai/activity")}
-          >
-            My Activity
-          </button>
+        {/* Logged In */}
+        {user ? (
+          <>
+            <span className="dash-welcome-pill">
+              Welcome, <span>{user.name}</span>
+            </span>
 
-          <button
-            className="dash-nav-btn dash-nav-btn--danger"
-            onClick={logout}
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
-    </>
+            <button
+              className="dash-nav-btn dash-nav-btn--ghost"
+              onClick={handleActivityClick}
+            >
+              My Activity
+            </button>
+
+            <button
+              className="dash-nav-btn dash-nav-btn--danger"
+              onClick={logout}
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          /* Logged Out */
+          <>
+            <button
+              className="dash-nav-btn dash-nav-btn--ghost"
+              onClick={() => navigate("/login")}
+            >
+              Login
+            </button>
+
+            <button
+              className="dash-nav-btn dash-nav-btn--primary"
+              onClick={() => navigate("/signup")}
+            >
+              Signup
+            </button>
+          </>
+        )}
+
+      </div>
+    </nav>
   );
 }

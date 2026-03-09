@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 import "../styles/Pricing.css";
 
@@ -34,11 +35,13 @@ const pricingPlans = [
 
 export default function Pricing() {
   return (
-    <div className="pricing-page">
-      <header className="pricing-nav glass-panel glass-panel--subtle">
-        <Link to="/" className="pricing-brand">
-          MeetPro
-        </Link>
+    <>
+      <Navbar />
+      <div className="pricing-page">
+        <header className="pricing-nav glass-panel glass-panel--subtle">
+          <Link to="/" className="pricing-brand">
+            MeetPro
+          </Link>
 
         <div className="pricing-nav-actions">
           <Link to="/login" className="btn-ghost pricing-nav-link">
@@ -108,5 +111,6 @@ export default function Pricing() {
         </section>
       </main>
     </div>
+    </>
   );
 }

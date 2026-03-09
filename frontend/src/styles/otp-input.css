@@ -1,0 +1,72 @@
+/* ========================================
+   OTP INPUT COMPONENT
+   ======================================== */
+
+.otp-root {
+  width: 100%;
+}
+
+.otp-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+}
+
+.otp-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.otp-box {
+  width: 48px;
+  height: 48px;
+  text-align: center;
+  background: var(--color-bg-surface, rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  cursor: text;
+}
+
+.otp-box--filled {
+  border-color: var(--color-accent-violet);
+}
+
+.otp-box:focus {
+  outline: none;
+  border-color: var(--color-accent-violet);
+  box-shadow: 0 0 0 3px rgba(124, 91, 245, 0.20);
+}
+
+.otp-separator {
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+}
+
+/* ---- 480px — smaller boxes ---- */
+@media (max-width: 480px) {
+  .otp-box {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .otp-row {
+    gap: 6px;
+  }
+
+  .otp-cell {
+    gap: 6px;
+  }
+}

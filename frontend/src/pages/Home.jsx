@@ -301,6 +301,7 @@ import { useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HeroScene from "../components/HeroScene";
+import Navbar from "../components/Navbar";
 
 import "../styles/Home.css";
 
@@ -481,23 +482,12 @@ function Home() {
   }, []);
 
   return (
+    <>
+      <Navbar />
+
     <div className="home-container">
 
-      {/* ======================== NAVBAR ======================== */}
-      <nav className="navbar glass-panel glass-panel--subtle">
-        <div className="logo">MeetPro</div>
-        <div className="nav-links">
-          {!user ? (
-            <>
-              <Link to="/login" className="nav-btn btn-ghost">Login</Link>
-              <Link to="/signup" className="nav-btn signup-btn btn-primary">Signup</Link>
-            </>
-          ) : (
-            <Link to="/dashboard" className="nav-btn signup-btn btn-primary">Go to Dashboard</Link>
-          )}
-        </div>
-      </nav>
-
+      
       {/* ======================== HERO ======================== */}
       <section className="hero depth-layer">
         <HeroScene />
@@ -677,6 +667,8 @@ function Home() {
       </footer>
 
     </div>
+
+    </>
   );
 }
 
