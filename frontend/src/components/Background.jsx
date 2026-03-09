@@ -1,24 +1,43 @@
+import { useEffect, useRef, memo } from "react";
+import { gsap } from "gsap";
 import "../styles/background.css";
 
 function Background() {
+  const orbVioletRef = useRef(null);
+  const orbPinkRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.to(orbVioletRef.current, {
+        x: 60,
+        y: -50,
+        duration: 9,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+      });
+
+      gsap.to(orbPinkRef.current, {
+        x: -50,
+        y: 70,
+        duration: 11,
+        delay: 1.5,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+      });
+    });
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <div className="cinematic-bg" aria-hidden="true">
-      {/* Mesh gradient orbs */}
-      <div className="cinematic-bg__orb cinematic-bg__orb--blue" />
-      <div className="cinematic-bg__orb cinematic-bg__orb--violet" />
-      <div className="cinematic-bg__orb cinematic-bg__orb--cyan" />
-
-      {/* Ambient radial glow layers */}
-      <div className="cinematic-bg__glow cinematic-bg__glow--top" />
-      <div className="cinematic-bg__glow cinematic-bg__glow--bottom" />
-
-      {/* Noise texture overlay */}
-      <div className="cinematic-bg__noise" />
-
-      {/* Vignette */}
-      <div className="cinematic-bg__vignette" />
+    <div className="bg-root" aria-hidden="true">
+      <div className="bg-orb bg-orb--violet" ref={orbVioletRef} />
+      <div className="bg-orb bg-orb--pink" ref={orbPinkRef} />
+      <div className="bg-vignette" />
     </div>
   );
 }
 
-export default Background;
+export default memo(Background);

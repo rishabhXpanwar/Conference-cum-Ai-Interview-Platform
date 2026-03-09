@@ -1,0 +1,84 @@
+/* ========================================
+   ALERT / TOAST — MeetPro
+   ======================================== */
+
+.alert-pill {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-toast);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-full);
+  max-width: 90vw;
+  white-space: nowrap;
+  box-shadow: var(--shadow-lg);
+  pointer-events: all;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+/* ---- Type variants ---- */
+
+.alert-pill--success {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.30);
+  color: rgba(52, 211, 153, 0.95);
+}
+
+.alert-pill--error {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.30);
+  color: rgba(252, 129, 129, 0.95);
+}
+
+.alert-pill--warning {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.30);
+  color: rgba(251, 191, 36, 0.95);
+}
+
+.alert-pill--info {
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.30);
+  color: rgba(165, 180, 252, 0.95);
+}
+
+/* ---- Icon ---- */
+
+.alert-pill-icon {
+  font-size: var(--text-base);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+/* ---- Message ---- */
+
+.alert-pill-message {
+  flex: 1;
+  line-height: var(--leading-normal);
+  white-space: normal;
+}
+
+/* ---- Close button ---- */
+
+.alert-pill-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: var(--text-xs);
+  color: inherit;
+  opacity: 0.6;
+  padding: 0 0 0 var(--space-2);
+  flex-shrink: 0;
+  font-family: var(--font-sans);
+  transition: opacity 150ms ease;
+}
+
+.alert-pill-close:hover {
+  opacity: 1;
+}

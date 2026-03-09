@@ -2,9 +2,12 @@ import { useContext, useState } from "react"
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../api/axios";
+import { useToasts } from "../components/Toast";
+import StarButton from "../components/StarButton";
+import MeetingCreatedModal from "../components/MeetingCreatedModal";
+import Navbar from "../components/Navbar";
 
 import "../styles/Dashboard.css";
-import Navbar from "../components/Navbar";
 
 
 
@@ -14,6 +17,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user , logout } = useContext(AuthContext);
+  const toasts = useToasts();
 
 
   const[error , seterror] = useState("");
@@ -55,15 +59,15 @@ export default function Dashboard() {
     }
   }
 
-  const handlecopy = ()=>{
+  const handlecopy = () => {
     navigator.clipboard.writeText(meetingCode);
-    alert("Meeting code copied to clipboard");
+    toasts.success("Meeting code copied!");
   };
 
-  const handleshare =() => {
+  const handleshare = () => {
     const link = `${window.location.origin}/meeting/${meetingCode}`;
     navigator.clipboard.writeText(link);
-    alert("Meeting Link copied");
+    toasts.success("Meeting link copied!");
   };
 
 
@@ -98,13 +102,9 @@ export default function Dashboard() {
             <p className="dash-card-desc">
               Start an instant room and invite participants with a code.
             </p>
-            <button
-              className="dash-btn dash-btn--primary"
-              onClick={handlecreateMeeting}
-              disabled={loading}
-            >
+            <StarButton variant="primary" onClick={handlecreateMeeting} disabled={loading}>
               {loading ? "Creating…" : "Create Meeting"}
-            </button>
+            </StarButton>
           </div>
 
           {/* Join Meeting */}
@@ -122,49 +122,23 @@ export default function Dashboard() {
               value={joincode}
               onChange={(e) => setjoincode(e.target.value)}
             />
-            <button
-              className="dash-btn dash-btn--join"
-              onClick={handlejoinMeeting}
-            >
+            <StarButton variant="join" onClick={handlejoinMeeting}>
               Join Meeting
-            </button>
+            </StarButton>
           </div>
 
         </div>
       </main>
 
       {/* ======================== MODAL ======================== */}
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-card">
-            <h3 className="modal-title">Meeting Created</h3>
-            <p className="modal-subtitle">Share the code with participants</p>
-
-            <div className="meeting-code-wrap">
-              <p className="meeting-code">{meetingCode}</p>
-            </div>
-
-            <div className="modal-buttons">
-              <button className="modal-btn" onClick={handlecopy}>Copy Code</button>
-              <button className="modal-btn" onClick={handleshare}>Share Link</button>
-            </div>
-
-            <button
-              className="join-btn"
-              onClick={() => navigate(`/meeting/${meetingCode}`)}
-            >
-              Join the Meeting
-            </button>
-
-            <span
-              className="close-text"
-              onClick={() => setshowModal(false)}
-            >
-              Dismiss
-            </span>
-          </div>
-        </div>
-      )}
+      <MeetingCreatedModal
+        isOpen={showModal}
+        onClose={() => setshowModal(false)}
+        meetingCode={meetingCode}
+        onCopy={handlecopy}
+        onShare={handleshare}
+        onJoin={() => navigate(`/meeting/${meetingCode}`)}
+      />
 
     </div>
 

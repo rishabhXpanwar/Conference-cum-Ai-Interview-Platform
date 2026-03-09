@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/axios";
 
-import "../styles/JoinAIInterviewModal.css";
+import "../styles/AIModal.css";
 
 export default function JoinAIInterviewModal({ close }) {
   const [aiCode, setAiCode] = useState("");
@@ -55,8 +55,8 @@ export default function JoinAIInterviewModal({ close }) {
   };
 
   return (
-    <div className="ai-modal-overlay">
-      <div className="ai-modal">
+    <div className="ai-modal-overlay" onClick={close}>
+      <div className="ai-modal" onClick={(e) => e.stopPropagation()}>
         <h2>Join AI Interview</h2>
 
         <input

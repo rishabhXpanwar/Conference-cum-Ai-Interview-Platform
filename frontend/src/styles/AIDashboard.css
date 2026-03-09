@@ -1,21 +1,211 @@
-.ai-dashboard{
-padding:40px;
-text-align:center;
+﻿/* ========================================
+   AI DASHBOARD PAGE
+   ======================================== */
+
+/* ---- DottedSurface ---- */
+
+.dotted-surface {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
 }
 
-.ai-actions{
-margin-top:40px;
-display:flex;
-justify-content:center;
-gap:40px;
+/* ---- Page shell ---- */
+
+.ai-dashboard-main {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+  padding-top: 72px; /* navbar height */
 }
 
-.ai-btn{
-padding:18px 40px;
-font-size:18px;
-background:#2563eb;
-color:white;
-border:none;
-border-radius:8px;
-cursor:pointer;
+/* ---- Left — robot ---- */
+
+.ai-dashboard-left {
+  width: 50%;
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-robot-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.ai-robot-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-robot-spinner {
+  display: block;
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(124, 58, 237, 0.25);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: aiSpinnerSpin 0.9s linear infinite;
+}
+
+@keyframes aiSpinnerSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- Right — cards ---- */
+
+.ai-dashboard-right {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 1rem 3rem;
+  gap: 1rem;
+}
+
+/* ---- Section header ---- */
+
+.ai-section-header {
+  margin-bottom: 0.5rem;
+}
+
+.ai-greeting {
+  font-size: clamp(1.4rem, 2.8vw, 2rem);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+  margin-bottom: 0.25rem;
+  background: linear-gradient(135deg, var(--color-text) 40%, var(--color-primary-bright));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.ai-greeting-sub {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* ---- Cards ---- */
+
+.ai-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.ai-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.25rem 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  transition:
+    border-color 300ms ease,
+    box-shadow 300ms ease,
+    transform 300ms ease;
+}
+
+.ai-card:hover {
+  border-color: rgba(124, 58, 237, 0.4);
+  box-shadow: 0 0 32px rgba(124, 58, 237, 0.1);
+  transform: translateY(-3px);
+}
+
+.ai-card-icon {
+  font-size: 1.5rem;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.ai-card--create .ai-card-icon {
+  background: rgba(124, 58, 237, 0.12);
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.2);
+}
+
+.ai-card--join .ai-card-icon {
+  background: rgba(6, 182, 212, 0.1);
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.18);
+}
+
+.ai-card-title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.ai-card-desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+  flex-grow: 1;
+}
+
+.ai-card .star-btn {
+  width: 100%;
+  justify-content: center;
+  min-height: 40px;
+  margin-top: 0.25rem;
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 992px) {
+  .ai-dashboard-left {
+    display: none;
+  }
+
+  .ai-dashboard-right {
+    width: 100%;
+    padding: 3rem 2rem;
+  }
+
+  .ai-cards {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .ai-card {
+    flex: 1;
+    min-width: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .ai-cards {
+    flex-direction: column;
+  }
+
+  .ai-dashboard-right {
+    padding: 2.5rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .ai-dashboard-right {
+    padding: 2rem 1rem;
+  }
+
+  .ai-card {
+    padding: 1.5rem;
+  }
+
+  .ai-card .star-btn {
+    width: 100%;
+  }
 }

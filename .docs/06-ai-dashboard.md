@@ -1,4 +1,4 @@
-# PAGE-05 — AI Dashboard
+# PAGE-06 — AI Dashboard
 
 ## Task
 Redesign `src/pages/AIDashboard.jsx` + `src/styles/AIDashboard.css`.
@@ -298,6 +298,6 @@ Same dark glassmorphism design language as Dashboard page.
 
 ## Completion
 1. List every created/modified file with one-line summary
-2. Mark `PAGE-05` as `[x]` in `.docs/ROADMAP.md`
+2. Mark `PAGE-06` as `[x]` in `.docs/ROADMAP.md`
 3. `TASK COMPLETE — AWAITING HUMAN REVIEW`
 4. STOP

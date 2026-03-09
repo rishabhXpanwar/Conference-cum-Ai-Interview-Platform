@@ -1,10 +1,9 @@
 /* ========================================
-   CINEMATIC MESH GRADIENT BACKGROUND
-   Performance: static orbs, no continuous
-   animations, single composite layer
+   BACKGROUND — MeetPro
+   Floating orbs via GSAP, vignette overlay
    ======================================== */
 
-.cinematic-bg {
+.bg-root {
   position: fixed;
   inset: 0;
   z-index: var(--z-background);
@@ -12,6 +11,52 @@
   overflow: hidden;
   background-color: var(--color-bg-deep);
   contain: strict;
+}
+
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.bg-orb--violet {
+  width: 720px;
+  height: 720px;
+  bottom: -15%;
+  left: -10%;
+  background: radial-gradient(
+    circle,
+    rgba(124, 58, 237, 0.18) 0%,
+    rgba(124, 58, 237, 0.06) 45%,
+    transparent 70%
+  );
+  filter: blur(var(--blur-xl));
+}
+
+.bg-orb--pink {
+  width: 600px;
+  height: 600px;
+  top: -12%;
+  right: -8%;
+  background: radial-gradient(
+    circle,
+    rgba(236, 72, 153, 0.14) 0%,
+    rgba(236, 72, 153, 0.04) 45%,
+    transparent 70%
+  );
+  filter: blur(var(--blur-xl));
+}
+
+.bg-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 40%,
+    rgba(8, 8, 8, 0.55) 80%,
+    rgba(8, 8, 8, 0.85) 100%
+  );
+  pointer-events: none;
 }
 
 /* ---- Static Mesh Gradient Orbs ---- */

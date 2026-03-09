@@ -7,6 +7,8 @@ import "../styles/AiMeetingRoom.css";
 
 import MicWaveform from "../components/MicWaveForm";
 import AiWaveform from "../components/AiWaveForm";
+import TextShimmer from "../components/TextShimmer";
+import { Mic, MicOff, Video, VideoOff, LogOut } from "lucide-react";
 
 import * as faceapi from "face-api.js";
 import * as tf from "@tensorflow/tfjs";
@@ -629,50 +631,62 @@ const startNoResponseTimer = () => {
 
   return (
     
-    <div className="ai-room">
-      <div className="ai-top">
+    <div className="airm-page">
+      <div className="airm-top">
         {/* 🔔 Notification */}
 {timerNotice && (
-  <div className="ai-timer-notice">
+  <div className="airm-timer-notice">
     ⏳ {timerNotice}
   </div>
 )}
 
 {/* ⏳ Timer */}
 {timeLeft && (
-  <div className={`interview-timer ${isWarning ? "timer-warning" : ""}`}>
+  <div className={`airm-timer ${isWarning ? "airm-timer--warning" : ""}`}>
     ⏳ Time Remaining: {timeLeft}
   </div>
 )}
 
-        <div className={`ai-avatar ${aiState}`}>
-          {aiState === "thinking" && <span>🤔 Thinking...</span>}
-          {aiState === "speaking" && <span>AI</span>}
+        <div className={`airm-avatar airm-avatar--${aiState}`}>
+          {aiState === "thinking" && (
+            <TextShimmer duration={1.5} className="airm-shimmer">
+              Thinking...
+            </TextShimmer>
+          )}
+          {aiState === "speaking" && (
+            <TextShimmer duration={2} className="airm-shimmer">
+              AI Interviewer
+            </TextShimmer>
+          )}
 
           <AiWaveform active={aiState === "speaking"} />
         </div>
 
-        <div className="ai-question">
-          {aiState === "thinking"
-            ? "AI is thinking..."
-            : question || "Waiting for interview to start"}
+        <div className="airm-question">
+          {aiState === "thinking" ? (
+            <TextShimmer duration={1.8} className="airm-question-shimmer">
+              AI is thinking...
+            </TextShimmer>
+          ) : (
+            question || "Waiting for interview to start"
+          )}
 
           {aiState === "listening" && !hasStartedSpeaking && (
-            <div className="response-timer">
+            <div className="airm-response-timer">
               Please start responding in {responseTimer}s
             </div>
           )}
         </div>
       </div>
 
-      <div className="ai-videos">
+      <div className="airm-videos">
         {role === "candidate" && (
           <video
             ref={localVideoRef}
             autoPlay
             muted
             playsInline
-            className="ai-video"
+            className="airm-video"
           />
         )}
 
@@ -681,7 +695,7 @@ const startNoResponseTimer = () => {
             key={socketId}
             autoPlay
             playsInline
-            className="ai-video"
+            className="airm-video"
             ref={(video) => {
               if (video) video.srcObject = stream;
             }}
@@ -689,30 +703,35 @@ const startNoResponseTimer = () => {
         ))}
       </div>
 
-      {warning && <div className="warning">{warning}</div>}
+      {warning && <div className="airm-warning">{warning}</div>}
 
       {aiState === "listening" && (
-        <div className="candidate-wave">
+        <div className="airm-candidate-wave">
           <MicWaveform stream={micStream} />
 
           <p>Listening...</p>
         </div>
       )}
 
-      <div className="ai-controls">
+      <div className="airm-controls">
         {role === "candidate" && (
           <>
-            <button disabled={!canSpeak} onClick={toggleAudio}>
-              {isMuted ? "Unmute" : "Mute"}
+            <button className="airm-ctrl-btn" disabled={!canSpeak} onClick={toggleAudio}>
+              {isMuted ? <MicOff size={18} /> : <Mic size={18} />}
+              <span>{isMuted ? "Unmute" : "Mute"}</span>
             </button>
 
-            <button onClick={toggleVideo}>
-              {isVideoOff ? "Camera On" : "Camera Off"}
+            <button className="airm-ctrl-btn" onClick={toggleVideo}>
+              {isVideoOff ? <Video size={18} /> : <VideoOff size={18} />}
+              <span>{isVideoOff ? "Camera On" : "Camera Off"}</span>
             </button>
           </>
         )}
 
-        <button onClick={leaveInterview}>Leave</button>
+        <button className="airm-ctrl-btn airm-ctrl-btn--leave" onClick={leaveInterview}>
+          <LogOut size={18} />
+          <span>Leave</span>
+        </button>
       </div>
     </div>
   );

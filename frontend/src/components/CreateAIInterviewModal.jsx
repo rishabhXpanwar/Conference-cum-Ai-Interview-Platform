@@ -1,7 +1,9 @@
-import { useState, useContext, useEffect } from "react";
+﻿import { useState, useContext, useEffect } from "react";
 import API from "../api/axios";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Briefcase, FileText, Copy, Share2, X, Zap } from "lucide-react";
 
 import "../styles/AIModal.css";
 
@@ -68,24 +70,43 @@ export default function CreateAIInterviewModal({ close }) {
   }
 
   return (
-    <div className="ai-modal-overlay">
-      <div className="ai-modal">
+    <motion.div
+      className="ai-modal-overlay"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={close}
+    >
+      <motion.div
+        className="ai-modal"
+        initial={{ opacity: 0, scale: 0.92, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.92, y: 16 }}
+        transition={{ duration: 0.25, ease: "easeOut" }}
+        onClick={(e) => e.stopPropagation()}
+      >
         <h2>Create AI Interview</h2>
 
         {!createdCode && (
           <>
-            <input
-              type="text"
-              placeholder="Job Role"
-              value={jobRole}
-              onChange={(e) => setJobRole(e.target.value)}
-            />
+            <div className="aim-input-group">
+              <Briefcase size={16} className="aim-input-icon" />
+              <input
+                type="text"
+                placeholder="Job Role"
+                value={jobRole}
+                onChange={(e) => setJobRole(e.target.value)}
+              />
+            </div>
 
-            <textarea
-              placeholder="Notes"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-            />
+            <div className="aim-input-group aim-input-group--textarea">
+              <FileText size={16} className="aim-input-icon" />
+              <textarea
+                placeholder="Notes"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+              />
+            </div>
 
             <div className="ai-modal-actions">
               <button className="ai-btn" onClick={createInterview}>
@@ -101,26 +122,21 @@ export default function CreateAIInterviewModal({ close }) {
 
         {createdCode && (
           <div className="ai-code-section">
+            <div className="aim-success-icon"><Zap size={20} /></div>
             <h3>Interview Created</h3>
 
             <div className="ai-code-box">{createdCode}</div>
 
             <div className="ai-code-actions">
-              <button className="ai-btn" onClick={copyCode}>
-                Copy Code
-              </button>
+              <button className="ai-btn" onClick={copyCode}><Copy size={15} /> Copy Code</button>
 
-              <button className="ai-btn" onClick={shareCode}>
-                Share
-              </button>
+              <button className="ai-btn" onClick={shareCode}><Share2 size={15} /> Share Link</button>
 
-              <button className="ai-btn-secondary" onClick={close}>
-                Close
-              </button>
+              <button className="ai-btn-secondary" onClick={close}><X size={15} /> Close</button>
             </div>
           </div>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

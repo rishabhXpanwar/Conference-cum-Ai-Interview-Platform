@@ -1,4 +1,4 @@
-# Copilot Master Directives — MeetPro Frontend Redesign
+<!-- # Copilot Master Directives — MeetPro Frontend Redesign
 
 ---
 
@@ -114,4 +114,4 @@ NEVER:
 1. List every file modified with a one-line summary of what changed
 2. Mark task `[x]` in ROADMAP.md
 3. Write exactly: `TASK COMPLETE — AWAITING HUMAN REVIEW`
-4. STOP — do not suggest or begin the next task
+4. STOP — do not suggest or begin the next task -->

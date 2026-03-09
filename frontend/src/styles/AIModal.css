@@ -1,63 +1,223 @@
-.ai-modal-overlay{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.4);
-display:flex;
-justify-content:center;
-align-items:center;
+﻿/* ========================================
+   AI INTERVIEW MODALS — Shared Styles
+   ======================================== */
+
+/* === OVERLAY === */
+.ai-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: var(--z-modal, 1000);
+  will-change: opacity;
 }
 
-.ai-modal{
-background:white;
-padding:30px;
-width:420px;
-border-radius:10px;
-display:flex;
-flex-direction:column;
-gap:15px;
+/* === MODAL CARD === */
+.ai-modal {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(124, 58, 237, 0.25);
+  border-radius: var(--radius-xl, 20px);
+  padding: 2rem;
+  width: 440px;
+  max-width: 92vw;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
+.ai-modal h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+/* === INPUT ICON GROUPS (CreateModal only) === */
+.aim-input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.aim-input-icon {
+  position: absolute;
+  left: 0.875rem;
+  color: var(--color-text-muted);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.aim-input-group--textarea {
+  align-items: flex-start;
+}
+
+.aim-input-group--textarea .aim-input-icon {
+  top: 0.875rem;
+}
+
+/* === ALL INPUTS === */
 .ai-modal input,
-.ai-modal textarea{
-padding:10px;
-border:1px solid #ddd;
-border-radius:6px;
+.ai-modal textarea {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md, 12px);
+  color: var(--color-text);
+  font-size: 0.9rem;
+  font-family: inherit;
+  outline: none;
+  resize: none;
+  box-sizing: border-box;
+  transition: border-color 200ms, box-shadow 200ms;
 }
 
-.ai-modal-actions{
-display:flex;
-justify-content:flex-end;
-gap:10px;
+/* CreateModal inputs — icon pushes text right */
+.aim-input-group input,
+.aim-input-group textarea {
+  padding: 0.75rem 0.875rem 0.75rem 2.5rem;
 }
 
-.ai-btn-secondary{
-background:#eee;
-border:none;
-padding:10px 18px;
-border-radius:6px;
-cursor:pointer;
+/* JoinModal input — no icon */
+.ai-input {
+  padding: 0.75rem 0.875rem;
 }
 
-
-.ai-code-section{
-text-align:center;
-margin-top:20px;
+.ai-modal textarea {
+  min-height: 90px;
 }
 
-.ai-code-box{
-background:#f4f4f4;
-padding:14px;
-font-size:20px;
-font-weight:bold;
-border-radius:8px;
-margin:15px 0;
+.ai-modal input:focus,
+.ai-modal textarea:focus {
+  border-color: var(--color-primary, #7C3AED);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
 }
 
-.ai-code-actions{
-display:flex;
-justify-content:center;
-gap:20px;
+/* === BUTTON ROWS === */
+.ai-modal-actions,
+.ai-modal-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Primary — CreateModal uses .ai-btn, JoinModal uses .ai-btn-primary */
+.ai-btn,
+.ai-btn-primary {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: var(--radius-md, 12px);
+  background: var(--color-primary, #7C3AED);
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 200ms, opacity 200ms;
+}
+
+.ai-btn:hover,
+.ai-btn-primary:hover {
+  background: var(--color-primary-bright, #6d28d9);
+}
+
+.ai-btn:disabled,
+.ai-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Secondary */
+.ai-btn-secondary {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md, 12px);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  font-size: 0.875rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 200ms, color 200ms, background 200ms;
+}
+
+.ai-btn-secondary:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  color: var(--color-text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* === SUCCESS VIEW (CreateModal) === */
+.ai-code-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.aim-success-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(124, 58, 237, 0.15);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary, #7C3AED);
+}
+
+.ai-code-section h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.ai-code-box {
+  background: rgba(124, 58, 237, 0.1);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: var(--radius-full, 9999px);
+  padding: 0.5rem 1.5rem;
+  font-family: monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-primary, #7C3AED);
+  letter-spacing: 0.1em;
+}
+
+.ai-code-actions {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.ai-code-actions .ai-btn,
+.ai-code-actions .ai-btn-secondary {
+  flex: 1;
+  min-width: 100px;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 480px) {
+  .ai-modal { padding: 1.5rem; }
+  .ai-code-actions,
+  .ai-modal-actions,
+  .ai-modal-buttons { flex-direction: column; }
 }

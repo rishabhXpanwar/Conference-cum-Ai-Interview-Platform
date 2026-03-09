@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import API from "../api/axios";
 import Navbar from "../components/Navbar";
 
@@ -68,7 +69,13 @@ export default function Activity() {
         {activity.length > 0 && (
           <ol className="act-timeline">
             {activity.slice(0, 5).map((item, index) => (
-              <li key={index} className="act-item">
+              <motion.li
+                key={index}
+                className="act-item"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
                 <div className="act-item-dot" />
                 <div className="act-card">
 
@@ -88,7 +95,7 @@ export default function Activity() {
                   </div>
 
                 </div>
-              </li>
+              </motion.li>
             ))}
           </ol>
         )}

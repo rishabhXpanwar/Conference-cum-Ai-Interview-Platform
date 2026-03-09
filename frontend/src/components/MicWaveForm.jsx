@@ -38,7 +38,7 @@ export default function MicWaveform({ stream }) {
       for (let i = 0; i < bufferLength; i++) {
         const barHeight = dataArray[i] / 2;
 
-        ctx.fillStyle = "#3b82f6";
+        ctx.fillStyle = "#7C3AED";
 
         ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
 

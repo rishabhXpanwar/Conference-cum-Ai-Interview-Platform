@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import API from "../api/axios";
+import StarButton from "../components/StarButton";
 import "../styles/ResumeUpload.css";
 
 export default function ResumeUpload() {
@@ -70,13 +71,13 @@ if (!file) {
   };
 
   return (
-    <div className="resume-page">
-      <div className="resume-box">
+    <div className="ru-page">
+      <div className="ru-box">
         <h2>Upload Resume</h2>
 
         <p>Your resume will be used to generate AI interview questions.</p>
 
-        <label className="file-input-label">
+        <label className="ru-file-label">
           <input
             type="file"
             accept=".pdf"
@@ -106,9 +107,9 @@ if (!file) {
 
         {/* Selected file preview */}
         {file && (
-          <div className="file-preview">
-            <span className="file-icon">📄</span>
-            <span className="file-name">{file.name}</span>
+          <div className="ru-file-preview">
+            <span className="ru-file-icon">📄</span>
+            <span className="ru-file-name">{file.name}</span>
           </div>
         )}
 
@@ -124,13 +125,13 @@ if (!file) {
 
         {/* Start Interview button */}
 
-        <button
-          className="start-interview-btn"
-          disabled={!uploaded}
+        <StarButton
           onClick={startInterview}
+          disabled={!uploaded}
+          variant="primary"
         >
           Start Interview
-        </button>
+        </StarButton>
       </div>
     </div>
   );

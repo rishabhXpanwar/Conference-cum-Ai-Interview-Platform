@@ -1,0 +1,307 @@
+/* ============================================
+   NAVBAR — Floating Card Design
+   ============================================ */
+
+/* Outer wrapper — kept for JSX compat, no layout role */
+.dash-nav-wrapper {
+  width: 100%;
+}
+
+/* .dash-nav-wrapper--scrolled — intentionally no styles, class exists in JSX */
+
+/* Inner nav — the bar itself */
+.dash-nav {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 2.5rem);
+  max-width: 1100px;
+  z-index: 100;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.75rem;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  box-shadow: none;
+  transition:
+    background 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    border-color 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    backdrop-filter 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.dash-nav--scrolled {
+  background: rgba(10, 10, 10, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-color: rgba(255, 255, 255, 0.10);
+  box-shadow:
+    0 4px 32px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ---- Logo ---- */
+.dash-nav-logo {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-decoration: none;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  cursor: default;
+  flex-shrink: 0;
+}
+
+/* ---- Mode Toggle Pill ---- */
+.dash-toggle-pill {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-full);
+}
+
+.dash-toggle-option {
+  padding: 0.3rem 0.85rem;
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid transparent;
+  font-family: var(--font-sans);
+  transition:
+    color 200ms ease,
+    background 200ms ease,
+    border-color 200ms ease;
+}
+
+.dash-toggle-option:hover {
+  color: var(--color-text-primary);
+}
+
+.dash-toggle-option--active {
+  background: linear-gradient(135deg, var(--color-primary), rgba(109, 40, 217, 0.85));
+  border-color: rgba(124, 58, 237, 0.5);
+  color: #fff;
+  font-weight: var(--weight-semibold);
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.25);
+}
+
+/* ---- Right side ---- */
+.dash-nav-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dash-welcome-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.7rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.dash-welcome-pill span {
+  color: var(--color-text-primary);
+  font-weight: var(--weight-medium);
+}
+
+/* ---- Nav buttons ---- */
+.dash-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: 34px;
+  transition:
+    color 200ms ease,
+    background 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    transform 150ms ease;
+}
+
+.dash-nav-btn--ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--color-text-muted);
+}
+
+.dash-nav-btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text-primary);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dash-nav-btn--danger {
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: rgba(239, 68, 68, 0.8);
+}
+
+.dash-nav-btn--danger:hover {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #f87171;
+}
+
+.dash-nav-btn--primary {
+  background: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  color: #0a0a0a;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.dash-nav-btn--primary:hover {
+  background: rgba(255, 255, 255, 0.88);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+/* ============================================
+   HAMBURGER (mobile only)
+   ============================================ */
+
+.dash-nav-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--color-text-primary);
+  flex-shrink: 0;
+}
+
+.dash-hamburger-icon {
+  width: 20px;
+  height: 20px;
+  transition-property: transform;
+  transition-timing-function: ease-in-out;
+}
+
+.dash-hamburger-icon--open {
+  transform: rotate(-45deg);
+}
+
+.dash-hamburger-path {
+  transition-property: stroke-dasharray, stroke-dashoffset;
+  transition-timing-function: ease-in-out;
+  stroke-dasharray: 12 63;
+}
+
+.dash-hamburger-path--open {
+  stroke-dasharray: 20 300;
+  stroke-dashoffset: -32.42px;
+}
+
+/* ============================================
+   MOBILE DROPDOWN MENU
+   ============================================ */
+
+.dash-nav-mobile-menu {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: calc(var(--z-overlay) - 1);
+  background: rgba(8, 8, 8, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.5rem 1.25rem;
+  animation: mobileMenuIn 250ms ease forwards;
+}
+
+@keyframes mobileMenuIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.dash-mobile-btn {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--color-text-primary);
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  text-align: left;
+  transition: background 150ms ease;
+  min-height: 48px;
+}
+
+.dash-mobile-btn:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.dash-mobile-btn--primary {
+  background: linear-gradient(135deg, var(--color-primary), rgba(109, 40, 217, 0.8));
+  border-color: rgba(124, 58, 237, 0.4);
+  color: #fff;
+}
+
+.dash-mobile-btn--primary:hover {
+  opacity: 0.88;
+}
+
+.dash-mobile-btn--danger {
+  background: transparent;
+  border-color: rgba(239, 68, 68, 0.2);
+  color: rgba(239, 68, 68, 0.8);
+}
+
+.dash-mobile-btn--danger:hover {
+  background: rgba(239, 68, 68, 0.07);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .dash-nav { padding: 0 1.25rem; width: calc(100% - 1.5rem); }
+  .dash-nav--scrolled { padding: 0 1.25rem; }
+  .dash-toggle-pill, .dash-nav-right { display: none; }
+  .dash-nav-hamburger { display: flex; }
+}
+
+@media (max-width: 480px) {
+  .dash-nav { padding: 0 1rem; width: calc(100% - 1rem); }
+}

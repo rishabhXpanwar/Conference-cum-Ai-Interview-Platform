@@ -1,97 +1,179 @@
-.resume-page {
-  height: 100vh;
+﻿/* ========================================
+   RESUME UPLOAD PAGE
+   ======================================== */
+
+/* ---- Page Shell + Orb Background ---- */
+
+.ru-page {
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #f6f7fb;
+  background: var(--color-bg);
+  position: relative;
+  overflow: hidden;
 }
 
-.resume-box {
-  background: black;
-  padding: 40px;
-  border-radius: 12px;
-  width: 400px;
+.ru-page::before {
+  content: '';
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--color-primary) 0%, transparent 70%);
+  opacity: 0.08;
+  top: -200px;
+  left: -200px;
+  animation: ruOrb1 12s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.ru-page::after {
+  content: '';
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--color-accent-cyan) 0%, transparent 70%);
+  opacity: 0.06;
+  bottom: -150px;
+  right: -150px;
+  animation: ruOrb2 15s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes ruOrb1 {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(60px, 40px) scale(1.1); }
+}
+
+@keyframes ruOrb2 {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(-50px, -30px) scale(1.08); }
+}
+
+/* ---- Card ---- */
+
+.ru-box {
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-xl);
+  padding: 2.5rem;
+  width: 420px;
+  max-width: 90vw;
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 1.25rem;
 }
 
-.resume-box h2 {
+.ru-box h2 {
+  font-size: 1.5rem;
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
   margin: 0;
 }
 
-.file-input-label {
+.ru-box p {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* ---- File Input Label ---- */
+
+.ru-file-label {
   display: inline-block;
-  padding: 10px 18px;
-  background: #eff6ff;
-  color: #2563eb;
-  border: 2px dashed #2563eb;
-  border-radius: 8px;
+  padding: 0.625rem 1.25rem;
+  background: rgba(124, 58, 237, 0.08);
+  color: var(--color-primary-bright);
+  border: 2px dashed rgba(124, 58, 237, 0.50);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  font-weight: 500;
-  transition: background 0.2s;
+  font-weight: var(--weight-medium);
+  transition:
+    background 200ms ease,
+    border-color 200ms ease;
 }
 
-.file-input-label:hover {
-  background: #dbeafe;
+.ru-file-label:hover {
+  background: rgba(124, 58, 237, 0.15);
+  border-color: var(--color-primary);
 }
 
-.file-input-label input {
+.ru-file-label input {
   display: none;
 }
 
-.file-preview {
+/* ---- File Preview ---- */
+
+.ru-file-preview {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 8px;
-  padding: 10px 14px;
+  gap: 0.625rem;
+  background: rgba(34, 197, 94, 0.06);
+  border: 1px solid rgba(34, 197, 94, 0.20);
+  border-radius: var(--radius-md);
+  padding: 0.625rem 0.875rem;
   word-break: break-all;
-}
-
-.file-icon {
-  font-size: 1.6rem;
-  flex-shrink: 0;
-}
-
-.file-name {
-  font-size: 0.875rem;
-  color: #166534;
-  font-weight: 500;
   text-align: left;
 }
 
-.resume-box button {
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  background: #2563eb;
-  color: white;
-  cursor: pointer;
+.ru-file-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
 }
 
-
-.start-interview-btn {
-
-  margin-top: 12px;
-  padding: 12px;
-
-  background: #16a34a;
-  color: white;
-
-  border: none;
-  border-radius: 8px;
-
-  cursor: pointer;
-
+.ru-file-name {
+  font-size: 0.875rem;
+  color: #4ade80;
+  font-weight: var(--weight-medium);
 }
 
-.start-interview-btn:disabled {
+/* ---- Upload Button ---- */
 
-  background: #9ca3af;
+.ru-box button:not(.star-btn) {
+  padding: 0.75rem;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: #fff;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-weight: var(--weight-semibold);
+  font-size: 0.9rem;
+  width: 100%;
+  min-height: 44px;
+  transition:
+    background 200ms ease,
+    opacity 200ms ease;
+}
+
+.ru-box button:not(.star-btn):hover:not(:disabled) {
+  background: var(--color-primary-bright);
+}
+
+.ru-box button:not(.star-btn):disabled {
+  opacity: 0.5;
   cursor: not-allowed;
+}
 
+/* ---- StarButton override — full width ---- */
+
+.ru-box .star-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 480px) {
+  .ru-box {
+    padding: 1.5rem;
+    gap: 1rem;
+  }
 }

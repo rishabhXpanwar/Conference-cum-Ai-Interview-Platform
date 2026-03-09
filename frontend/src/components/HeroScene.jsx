@@ -160,7 +160,6 @@ function HeroScene() {
       <ambientLight intensity={0.15} />
       <CameraRig />
       <ParticleField />
-      <WireSphere />
     </Canvas>
   );
 }

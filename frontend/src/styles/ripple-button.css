@@ -1,0 +1,30 @@
+/* ========================================
+   RIPPLE BUTTON
+   ======================================== */
+
+.ripple-btn {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  isolation: isolate;
+  display: block;
+}
+
+.ripple-btn[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.ripple-btn__effect {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.22);
+  animation: jsRipple 600ms ease-out forwards;
+  transform-origin: center;
+}
+
+@keyframes jsRipple {
+  0%   { transform: scale(0); opacity: 1; }
+  100% { transform: scale(1); opacity: 0; }
+}

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import ShaderBackground from "../components/ShaderBackground";
+import RippleButton from "../components/RippleButton";
 
 import "../styles/Pricing.css";
 
@@ -36,8 +37,8 @@ const pricingPlans = [
 export default function Pricing() {
   return (
     <>
-      <Navbar />
       <div className="pricing-page">
+        <ShaderBackground />
         <header className="pricing-nav glass-panel glass-panel--subtle">
           <Link to="/" className="pricing-brand">
             MeetPro
@@ -94,16 +95,20 @@ export default function Pricing() {
                 </div>
 
                 {isCustomPlan ? (
-                  <a
-                    className="btn-glow pricing-cta"
-                    href="mailto:support@meetpro.ai?subject=Custom%20AI%20Interview%20Plan"
-                  >
-                    Contact Us
-                  </a>
+                  <RippleButton className="pricing-cta-wrap">
+                    <a
+                      className="btn-glow pricing-cta"
+                      href="mailto:support@meetpro.ai?subject=Custom%20AI%20Interview%20Plan"
+                    >
+                      Contact Us
+                    </a>
+                  </RippleButton>
                 ) : (
-                  <Link to="/signup" className="btn-primary pricing-cta">
-                    Join Us!
-                  </Link>
+                  <RippleButton className="pricing-cta-wrap">
+                    <Link to="/signup" className="btn-primary pricing-cta">
+                      Join Us!
+                    </Link>
+                  </RippleButton>
                 )}
               </article>
             );

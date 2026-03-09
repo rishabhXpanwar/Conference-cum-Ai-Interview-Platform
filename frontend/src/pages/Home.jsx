@@ -1,299 +1,3 @@
-// import "./Home.css";
-// import { motion, useMotionValue, useTransform } from "framer-motion";
-// import { useNavigate } from "react-router-dom";
-
-// function Home() {
-//   const navigate = useNavigate();
-
-//   /* ---------------- PARALLAX SETUP ---------------- */
-//   const x = useMotionValue(0);
-//   const y = useMotionValue(0);
-
-//   const rotateX = useTransform(y, [-200, 200], [10, -10]);
-//   const rotateY = useTransform(x, [-200, 200], [-10, 10]);
-
-//   const handleMouseMove = (e) => {
-//     const rect = e.currentTarget.getBoundingClientRect();
-//     x.set(e.clientX - rect.left - rect.width / 2);
-//     y.set(e.clientY - rect.top - rect.height / 2);
-//   };
-
-//   const resetTilt = () => {
-//     x.set(0);
-//     y.set(0);
-//   };
-
-//   return (
-//     <div className="outer-bg">
-      
-//       {/* ================= HERO SECTION ================= */}
-//       <section className="hero-wrapper">
-
-//         <motion.div
-//           className="hero-card"
-//           style={{ rotateX, rotateY }}
-//           onMouseMove={handleMouseMove}
-//           onMouseLeave={resetTilt}
-//           initial={{ opacity: 0, y: 60 }}
-//           animate={{ opacity: 1, y: 0 }}
-//           transition={{ duration: 0.8 }}
-//         >
-
-//           {/* Floating Gradient Blobs */}
-//           <div className="blob blob1"></div>
-//           <div className="blob blob2"></div>
-
-//           {/* ---------------- NAVBAR ---------------- */}
-//           <nav className="nav">
-//             <div className="logo">MeetSphere</div>
-
-//             <div className="nav-links">
-//               <a href="#">Home</a>
-//               <a href="#features">Features</a>
-//               <a href="#ai">AI Interview</a>
-//               <a href="#contact">Contact</a>
-//             </div>
-
-//             <div className="nav-buttons">
-//               <button
-//                 className="signup"
-//                 onClick={() => navigate("/signup")}
-//               >
-//                 Sign Up
-//               </button>
-
-//               <button
-//                 className="login"
-//                 onClick={() => navigate("/login")}
-//               >
-//                 Login
-//               </button>
-//             </div>
-//           </nav>
-
-//           {/* ---------------- HERO CONTENT ---------------- */}
-//           <div className="hero-content">
-
-//             <motion.div
-//               className="left"
-//               initial={{ x: -80, opacity: 0 }}
-//               animate={{ x: 0, opacity: 1 }}
-//               transition={{ delay: 0.3 }}
-//             >
-//               <h1>AI Powered Video Conferencing</h1>
-
-//               <p>
-//                 Conduct seamless meetings or switch to AI Interview mode.
-//                 Real-time chat, attendance tracking and adaptive questioning —
-//                 all in one intelligent platform.
-//               </p>
-
-//               <div className="buttons">
-//                 <button className="btn-primary">
-//                   Get Started
-//                 </button>
-
-//                 <button className="btn-secondary">
-//                   Explore
-//                 </button>
-//               </div>
-//             </motion.div>
-
-//             <motion.div
-//               className="right"
-//               initial={{ x: 80, opacity: 0 }}
-//               animate={{ x: 0, opacity: 1 }}
-//               transition={{ delay: 0.5 }}
-//             >
-//               {/* Put your SVG inside public folder */}
-//               <img
-//                 src="/illustration.svg"
-//                 alt="Video Illustration"
-//                 className="hero-img"
-//               />
-//             </motion.div>
-
-//           </div>
-//         </motion.div>
-//       </section>
-
-
-//       {/* ================= FEATURES SECTION ================= */}
-//       <motion.section
-//         id="features"
-//         className="features-section"
-//         initial={{ opacity: 0, y: 80 }}
-//         whileInView={{ opacity: 1, y: 0 }}
-//         transition={{ duration: 0.8 }}
-//         viewport={{ once: true }}
-//       >
-//         <h2>Why MeetSphere?</h2>
-
-//         <div className="feature-grid">
-
-//           <motion.div
-//             className="feature-card"
-//             whileHover={{ scale: 1.05 }}
-//           >
-//             <h3>HD Video Calls</h3>
-//             <p>
-//               Powered by WebRTC for ultra-clear, low-latency meetings.
-//             </p>
-//           </motion.div>
-
-//           <motion.div
-//             className="feature-card"
-//             whileHover={{ scale: 1.05 }}
-//           >
-//             <h3>Real-time Chat</h3>
-//             <p>
-//               Instant messaging integrated directly into meeting rooms.
-//             </p>
-//           </motion.div>
-
-//           <motion.div
-//             className="feature-card"
-//             whileHover={{ scale: 1.05 }}
-//           >
-//             <h3>Attendance Tracking</h3>
-//             <p>
-//               Automatic session logs and activity monitoring.
-//             </p>
-//           </motion.div>
-
-//         </div>
-//       </motion.section>
-
-
-//       {/* ================= AI INTERVIEW SECTION ================= */}
-//       <motion.section
-//         id="ai"
-//         className="ai-section"
-//         initial={{ opacity: 0, y: 80 }}
-//         whileInView={{ opacity: 1, y: 0 }}
-//         transition={{ duration: 0.8 }}
-//         viewport={{ once: true }}
-//       >
-//         <h2>AI Interview Platform</h2>
-
-//         <p>
-//           Switch to Interview Mode. Upload resume. 
-//           Let AI conduct technical, DSA and behavioral rounds dynamically.
-//         </p>
-
-//         <div className="ai-cards">
-
-//           <motion.div
-//             className="ai-card"
-//             whileHover={{ scale: 1.05 }}
-//           >
-//             Resume Parsing
-//           </motion.div>
-
-//           <motion.div
-//             className="ai-card"
-//             whileHover={{ scale: 1.05 }}
-//           >
-//             Adaptive DSA Questions
-//           </motion.div>
-
-//           <motion.div
-//             className="ai-card"
-//             whileHover={{ scale: 1.05 }}
-//           >
-//             Behavioral Insights
-//           </motion.div>
-
-//         </div>
-//       </motion.section>
-
-
-//       {/* ================= CONTACT SECTION ================= */}
-//       <motion.section
-//         id="contact"
-//         className="contact-section"
-//         initial={{ opacity: 0 }}
-//         whileInView={{ opacity: 1 }}
-//         transition={{ duration: 1 }}
-//         viewport={{ once: true }}
-//       >
-//         <h2>Ready to Experience MeetSphere?</h2>
-
-//         <button
-//           className="cta-button"
-//           onClick={() => navigate("/signup")}
-//         >
-//           Start Now
-//         </button>
-//       </motion.section>
-
-//       {/* ================= FOOTER ================= */}
-// <footer className="footer">
-
-//   <div className="footer-container">
-
-//     {/* Brand Column */}
-//     <div className="footer-col">
-//       <h3>MeetSphere</h3>
-//       <p>
-//         AI powered video conferencing and intelligent interview
-//         platform designed for modern teams.
-//       </p>
-//     </div>
-
-//     {/* Product Links */}
-//     <div className="footer-col">
-//       <h4>Product</h4>
-//       <ul>
-//         <li>Video Meetings</li>
-//         <li>AI Interview Mode</li>
-//         <li>Attendance Tracking</li>
-//         <li>Real-time Chat</li>
-//       </ul>
-//     </div>
-
-//     {/* Company Links */}
-//     <div className="footer-col">
-//       <h4>Company</h4>
-//       <ul>
-//         <li>About Us</li>
-//         <li>Careers</li>
-//         <li>Blog</li>
-//         <li>Contact</li>
-//       </ul>
-//     </div>
-
-//     {/* Social */}
-//     <div className="footer-col">
-//       <h4>Connect</h4>
-//       <ul>
-//         <li>LinkedIn</li>
-//         <li>Twitter</li>
-//         <li>GitHub</li>
-//         <li>Instagram</li>
-//       </ul>
-//     </div>
-
-//   </div>
-
-//   <div className="footer-bottom">
-//     © {new Date().getFullYear()} MeetSphere. All rights reserved.
-//   </div>
-
-// </footer>
-
-//     </div>
-//   );
-// }
-
-// export default Home;
-
-
-
-//--------------------------------------self version-------------------------------------------------------
-
-
-
 import { Link } from "react-router-dom";
 import { useContext, useEffect, useRef } from "react";
 import { AuthContext } from "../context/AuthContext";
@@ -302,6 +6,10 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HeroScene from "../components/HeroScene";
 import Navbar from "../components/Navbar";
+import ShaderBackground from "../components/ShaderBackground";
+import MagnetizeButton from "../components/MagnetizeButton";
+import FeatureBento from "../components/FeatureBento";
+import HomeFooter from "../components/HomeFooter";
 
 import "../styles/Home.css";
 
@@ -362,7 +70,7 @@ function Home() {
         });
 
       gsap.fromTo(
-        featCardsRef.current?.querySelectorAll(".feature-card"),
+        featCardsRef.current?.querySelectorAll(".home-feat-card"),
         { opacity: 0, y: 40 },
         {
           opacity: 1, y: 0, duration: 0.7, ease: "power3.out",
@@ -387,7 +95,7 @@ function Home() {
         });
 
       gsap.fromTo(
-        aiStepsRef.current?.querySelectorAll(".ai-step"),
+        aiStepsRef.current?.querySelectorAll(".home-ai-step"),
         { opacity: 0, y: 36 },
         {
           opacity: 1, y: 0, duration: 0.65, ease: "power3.out",
@@ -415,70 +123,44 @@ function Home() {
     return () => ctx.revert();
   }, []);
 
-  /* ---- Card hover tilt + float + AI step float ---- */
+  /* ---- Card hover tilt ---- */
   useEffect(() => {
     const cleanups = [];
-
-    /* Feature card 3D hover tilt + subtle float */
-    const cards = featCardsRef.current?.querySelectorAll(".feature-card");
-    cards?.forEach((card, i) => {
-      /* Floating y oscillation — starts slightly delayed per card */
-      const floatTween = gsap.to(card, {
-        y: -7,
-        duration: 2.2 + i * 0.28,
-        ease: "sine.inOut",
-        repeat: -1,
-        yoyo: true,
-        delay: 1.4 + i * 0.18,
-      });
-      cleanups.push(() => floatTween.kill());
-
-      /* 3D tilt on mouse move */
-      const onMove = (e) => {
-        const rect = card.getBoundingClientRect();
-        const dx = (e.clientX - (rect.left + rect.width  / 2)) / (rect.width  / 2);
-        const dy = (e.clientY - (rect.top  + rect.height / 2)) / (rect.height / 2);
-        gsap.to(card, {
-          rotationX: -dy * 7,
-          rotationY:  dx * 7,
-          transformPerspective: 900,
-          ease: "power2.out",
-          duration: 0.35,
-          overwrite: "auto",
+    const ctx = gsap.context(() => {
+      const cards = featCardsRef.current?.querySelectorAll(".home-feat-card");
+      cards?.forEach((card) => {
+        const onMove = (e) => {
+          const rect = card.getBoundingClientRect();
+          const dx = (e.clientX - (rect.left + rect.width  / 2)) / (rect.width  / 2);
+          const dy = (e.clientY - (rect.top  + rect.height / 2)) / (rect.height / 2);
+          gsap.to(card, {
+            rotationX: -dy * 7,
+            rotationY:  dx * 7,
+            transformPerspective: 900,
+            ease: "power2.out",
+            duration: 0.35,
+            overwrite: "auto",
+          });
+        };
+        const onLeave = () => {
+          gsap.to(card, {
+            rotationX: 0,
+            rotationY: 0,
+            ease: "power3.out",
+            duration: 0.55,
+            overwrite: "auto",
+          });
+        };
+        card.addEventListener("mousemove", onMove);
+        card.addEventListener("mouseleave", onLeave);
+        cleanups.push(() => {
+          card.removeEventListener("mousemove", onMove);
+          card.removeEventListener("mouseleave", onLeave);
         });
-      };
-      const onLeave = () => {
-        gsap.to(card, {
-          rotationX: 0,
-          rotationY: 0,
-          ease: "power3.out",
-          duration: 0.55,
-          overwrite: "auto",
-        });
-      };
-      card.addEventListener("mousemove", onMove);
-      card.addEventListener("mouseleave", onLeave);
-      cleanups.push(() => {
-        card.removeEventListener("mousemove", onMove);
-        card.removeEventListener("mouseleave", onLeave);
       });
     });
 
-    /* AI step subtle float stagger */
-    const steps = aiStepsRef.current?.querySelectorAll(".ai-step");
-    steps?.forEach((step, i) => {
-      const floatTween = gsap.to(step, {
-        y: -5,
-        duration: 2.6 + i * 0.22,
-        ease: "sine.inOut",
-        repeat: -1,
-        yoyo: true,
-        delay: 2.0 + i * 0.30,
-      });
-      cleanups.push(() => floatTween.kill());
-    });
-
-    return () => cleanups.forEach((fn) => fn());
+    return () => { cleanups.forEach((fn) => fn()); ctx.revert(); };
   }, []);
 
   return (
@@ -487,9 +169,9 @@ function Home() {
 
     <div className="home-container">
 
-      
       {/* ======================== HERO ======================== */}
       <section className="hero depth-layer">
+        <ShaderBackground />
         <HeroScene />
         <div className="hero-glow-orb" />
 
@@ -508,9 +190,9 @@ function Home() {
         </p>
 
         <div className="hero-buttons" ref={heroBtnRef}>
-          <Link to="/signup" className="btn-primary hero-cta-primary">
+          <MagnetizeButton onClick={() => navigate("/signup")} className="hero-cta-primary">
             Start a Meeting
-          </Link>
+          </MagnetizeButton>
           <a href="#ai-section" className="btn-glow hero-cta-secondary">
             Explore AI Mode
           </a>
@@ -542,50 +224,8 @@ function Home() {
           Every component is engineered for low-latency, high-reliability real-time communication.
         </p>
 
-        <div className="feature-grid" ref={featCardsRef}>
-          <div className="feature-card glass-panel ambient-glow">
-            <div className="feature-card__icon">
-              <span className="feat-icon feat-icon--video" />
-            </div>
-            <h3>HD Video Conferencing</h3>
-            <p>
-              WebRTC peer-to-peer video and audio with adaptive bitrate.
-              No plugins. No latency compromises.
-            </p>
-          </div>
-
-          <div className="feature-card glass-panel ambient-glow">
-            <div className="feature-card__icon">
-              <span className="feat-icon feat-icon--chat" />
-            </div>
-            <h3>Real-time Messaging</h3>
-            <p>
-              In-session chat powered by Socket.io. Messages sync
-              instantly across all participants.
-            </p>
-          </div>
-
-          <div className="feature-card glass-panel ambient-glow">
-            <div className="feature-card__icon">
-              <span className="feat-icon feat-icon--shield" />
-            </div>
-            <h3>Secure by Design</h3>
-            <p>
-              JWT authentication with OTP-verified email. Every session
-              is access-controlled and auditable.
-            </p>
-          </div>
-
-          <div className="feature-card glass-panel ambient-glow">
-            <div className="feature-card__icon">
-              <span className="feat-icon feat-icon--activity" />
-            </div>
-            <h3>Attendance Tracking</h3>
-            <p>
-              Automatic session logs, join/leave timestamps and
-              activity summaries — available in your dashboard.
-            </p>
-          </div>
+        <div ref={featCardsRef}>
+          <FeatureBento />
         </div>
       </section>
 
@@ -607,35 +247,51 @@ function Home() {
           </div>
 
           <div className="ai-steps" ref={aiStepsRef}>
-            <div className="ai-step glass-panel">
-              <div className="ai-step__number">01</div>
-              <div className="ai-step__content">
+            <div className="home-ai-step">
+              <div className="home-ai-step__number">01</div>
+              <div className="home-ai-step__content">
                 <h4>Upload Resume</h4>
                 <p>The AI parses your skills, experience and tech stack to build a personalised question set.</p>
               </div>
             </div>
 
-            <div className="ai-step glass-panel">
-              <div className="ai-step__number">02</div>
-              <div className="ai-step__content">
+            <div className="home-ai-step">
+              <div className="home-ai-step__number">02</div>
+              <div className="home-ai-step__content">
                 <h4>Enter Interview Room</h4>
                 <p>Join a dedicated session with your meeting code. The AI moderator is already waiting.</p>
               </div>
             </div>
 
-            <div className="ai-step glass-panel">
-              <div className="ai-step__number">03</div>
-              <div className="ai-step__content">
+            <div className="home-ai-step">
+              <div className="home-ai-step__number">03</div>
+              <div className="home-ai-step__content">
                 <h4>Adaptive Questioning</h4>
                 <p>DSA, system design and behavioural rounds — dynamically constructed from your profile.</p>
               </div>
             </div>
 
-            <div className="ai-step glass-panel">
-              <div className="ai-step__number">04</div>
-              <div className="ai-step__content">
+            <div className="home-ai-step">
+              <div className="home-ai-step__number">04</div>
+              <div className="home-ai-step__content">
                 <h4>Intelligent Evaluation</h4>
                 <p>Receive structured feedback and scoring immediately after the session ends.</p>
+              </div>
+            </div>
+
+            <div className="home-ai-step">
+              <div className="home-ai-step__number">05</div>
+              <div className="home-ai-step__content">
+                <h4>Face Attention Detection</h4>
+                <p>FaceAPI monitors candidate presence in real time — ensuring integrity throughout the session.</p>
+              </div>
+            </div>
+
+            <div className="home-ai-step">
+              <div className="home-ai-step__number">06</div>
+              <div className="home-ai-step__content">
+                <h4>Score &amp; Feedback Report</h4>
+                <p>Technical, communication and overall scores — delivered as a structured report the moment the interview ends.</p>
               </div>
             </div>
           </div>
@@ -644,16 +300,16 @@ function Home() {
 
       {/* ======================== CTA ======================== */}
       <section className="cta-section" ref={ctaSecRef}>
-        <div className="cta-section__inner glass-panel glass-panel--strong">
+        <div className="cta-section__inner home-cta-box">
           <div className="cta-glow-orb" />
           <h2 className="cta-heading">Ready to collaborate at a higher level?</h2>
           <p className="cta-sub">
             Create your account in seconds. No credit card. No waiting.
           </p>
           <div className="cta-buttons">
-            <Link to="/signup" className="btn-primary cta-btn-primary">
+            <MagnetizeButton onClick={() => navigate("/signup")} className="cta-btn-primary">
               Get Started Free
-            </Link>
+            </MagnetizeButton>
             <Link to="/login" className="btn-glow cta-btn-secondary">
               Sign In
             </Link>
@@ -662,9 +318,7 @@ function Home() {
       </section>
 
       {/* ======================== FOOTER ======================== */}
-      <footer className="footer">
-        © {new Date().getFullYear()} MeetPro. All rights reserved.
-      </footer>
+      <HomeFooter />
 
     </div>
 
