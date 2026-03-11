@@ -243,7 +243,7 @@ function Home() {
               full technical and behavioral interview — adapting questions
               in real time based on your responses.
             </p>
-            <span className="ai-coming-badge">Coming Soon</span>
+            <span className="ai-coming-badge">Live Now</span>
           </div>
 
           <div className="ai-steps" ref={aiStepsRef}>
