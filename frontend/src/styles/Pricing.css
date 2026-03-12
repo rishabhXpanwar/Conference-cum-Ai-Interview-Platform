@@ -24,44 +24,6 @@
   font-family: var(--font-sans);
 }
 
-/* ---- Nav ---- */
-
-.pricing-nav {
-  position: relative;
-  z-index: var(--z-overlay);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.5rem 8%;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  background: rgba(255, 255, 255, 0.02);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.pricing-brand {
-  font-size: 1.35rem;
-  font-weight: var(--weight-bold);
-  letter-spacing: 0.08em;
-  text-decoration: none;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent-cyan));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.pricing-nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.pricing-nav-link {
-  min-width: 96px;
-  text-align: center;
-}
-
 /* ---- Hero ---- */
 
 .pricing-hero {
@@ -370,14 +332,6 @@
 }
 
 @media (max-width: 480px) {
-  .pricing-nav {
-    padding: 1rem 5%;
-  }
-
-  .pricing-nav-actions {
-    display: none;
-  }
-
   .pricing-hero {
     padding: 3rem 5% 2.5rem;
   }

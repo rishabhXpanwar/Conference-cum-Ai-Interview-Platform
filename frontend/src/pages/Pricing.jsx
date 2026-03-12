@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import ShaderBackground from "../components/ShaderBackground";
 import RippleButton from "../components/RippleButton";
+import Navbar from "../components/Navbar";
 
 import "../styles/Pricing.css";
 
@@ -39,21 +40,7 @@ export default function Pricing() {
     <>
       <div className="pricing-page">
         <ShaderBackground />
-        <header className="pricing-nav glass-panel glass-panel--subtle">
-          <Link to="/" className="pricing-brand">
-            MeetPro
-          </Link>
-
-        <div className="pricing-nav-actions">
-          <Link to="/login" className="btn-ghost pricing-nav-link">
-            Login
-          </Link>
-
-          <Link to="/signup" className="btn-primary pricing-nav-link">
-            Signup
-          </Link>
-        </div>
-      </header>
+        <Navbar />
 
       <main className="pricing-hero">
         <div className="pricing-copy">

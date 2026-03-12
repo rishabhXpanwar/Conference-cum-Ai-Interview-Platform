@@ -235,10 +235,9 @@
 .hero-head-accent {
   background: linear-gradient(
     135deg,
-    var(--color-accent-blue) 0%,
-    var(--color-accent-violet) 40%,
-    var(--color-accent-cyan) 65%,
-    var(--color-accent-blue) 100%
+    var(--color-accent-cyan)  0%,
+    var(--color-accent-pink)  45%,
+    var(--color-accent-cyan)  100%
   );
   background-size: 200% auto;
   -webkit-background-clip: text;
