@@ -59,9 +59,17 @@ const isMountedRef = useRef(true); // 👈 Ye track karega ki component zinda ha
 
   const loadModels = async () => {
     try {
-      await tf.setBackend("cpu");
-      await tf.ready();
-
+      const backends = ["webgl", "wasm", "cpu"];
+    for (const backend of backends) {
+      try {
+        await tf.setBackend(backend);
+        await tf.ready();
+        console.log(`TF backend set to: ${backend}`);
+        break;
+      } catch {
+        console.warn(`${backend} backend failed, trying next...`);
+      }
+    }
       await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
       await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
 

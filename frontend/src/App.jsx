@@ -18,7 +18,7 @@ import AiMeetingRoom from "./pages/AiMeetingRoom.jsx"
 function App() {
   return (
     <div className="app-shell">
-      <Background />
+      {/* <Background /> */}
       <div className="app-content">
         <Routes>
           {/* Public Routes */}

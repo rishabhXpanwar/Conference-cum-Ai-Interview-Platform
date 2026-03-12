@@ -172,7 +172,7 @@ function Home() {
       {/* ======================== HERO ======================== */}
       <section className="hero depth-layer">
         <ShaderBackground />
-        <HeroScene />
+        {/* <HeroScene /> */}
         <div className="hero-glow-orb" />
 
         <span className="hero-tag" ref={heroTagRef}>

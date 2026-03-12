@@ -153,10 +153,19 @@ function ShaderBackground() {
     };
 
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      gl.viewport(0, 0, canvas.width, canvas.height);
-    };
+  // Device ke pixel ratio ko limit kar do (Max 1 ya 1.5 tak)
+  // Isse 4K screens par GPU ko 4x zyada pixels render nahi karne padenge
+  const pixelRatio = Math.min(window.devicePixelRatio, 1); 
+  
+  canvas.width = window.innerWidth * pixelRatio;
+  canvas.height = window.innerHeight * pixelRatio;
+  
+  // CSS se canvas ko poori screen par stretch rakho
+  canvas.style.width = `${window.innerWidth}px`;
+  canvas.style.height = `${window.innerHeight}px`;
+  
+  gl.viewport(0, 0, canvas.width, canvas.height);
+};
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
