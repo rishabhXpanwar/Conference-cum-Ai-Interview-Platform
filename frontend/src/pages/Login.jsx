@@ -126,6 +126,14 @@ export default function Login() {
             </p>
           </RevealField>
 
+          <RevealField delay={0.08}>
+            <p className="auth-render-note">
+              This project is deployed on Render, so the backend can take a few
+              seconds to wake up. After clicking the Log In or Sign Up button,
+              please wait a moment before trying again.
+            </p>
+          </RevealField>
+
           {error && <div className="auth-error">{error}</div>}
 
           {/* Password login */}
